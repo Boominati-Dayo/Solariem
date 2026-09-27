@@ -3,8 +3,6 @@
 // Loads .env.local as well as .env, matching Next.js. Plain 'dotenv/config'
 // only reads .env, so MONGODB_URI looked unset here while the app connected fine.
 import './load-env.mjs';
-import { config } from 'dotenv';
-config({ path: '.env.local' });
 import { MongoClient, ObjectId } from 'mongodb';
 import bcrypt from 'bcryptjs';
 
@@ -16,9 +14,25 @@ if (!uri) {
   process.exit(1);
 }
 
-const EMAIL = (process.env.UNVERIFIED_EMAIL || 'sam@solariem.com').toLowerCase();
-const PASSWORD = process.env.UNVERIFIED_PASSWORD || 'Sam@2026!';
-const PIN = process.env.UNVERIFIED_PIN || '4321';
+// No default credentials. This script previously fell back to the literal
+// 'Sam@2026!' with PIN '4321', so running it on a fresh database created a
+// real loginable account with a credential published in this file. It now
+// refuses to run unless all three are set explicitly in .env.local.
+const missing = ['UNVERIFIED_EMAIL', 'UNVERIFIED_PASSWORD', 'UNVERIFIED_PIN'].filter(
+  (k) => !process.env[k]
+);
+if (missing.length) {
+  console.error('Refusing to seed. Missing from .env.local: ' + missing.join(', '));
+  console.error('');
+  console.error('This script creates a loginable account, so it will not invent a');
+  console.error('password. Set UNVERIFIED_EMAIL, UNVERIFIED_PASSWORD and');
+  console.error('UNVERIFIED_PIN first, or delete the script if it is not needed.');
+  process.exit(1);
+}
+
+const EMAIL = process.env.UNVERIFIED_EMAIL.toLowerCase();
+const PASSWORD = process.env.UNVERIFIED_PASSWORD;
+const PIN = process.env.UNVERIFIED_PIN;
 
 function generateUserCode() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -81,12 +95,13 @@ try {
     city: 'San Francisco',
     zip: '94103',
     currency: 'USD',
-    totalInvested: 0,
-    currentInvestment: 0,
     totalDeposit: 0,
     totalWithdraw: 0,
     referralEarnings: 0,
-    balances: { main: 250, investment: 0, referral: 0, total: 250 },
+    // Field set matches the User interface in src/lib/auth/user.ts, which has
+    // no investment balance. The previous version of this script still wrote
+    // totalInvested, currentInvestment and balances.investment.
+    balances: { main: 250, referral: 0, total: 250 },
     kycStatus: 'unverified',
     kycDocuments: null,
     kycSubmittedAt: null,
