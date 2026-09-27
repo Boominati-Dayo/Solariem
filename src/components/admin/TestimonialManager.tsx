@@ -158,7 +158,7 @@ const TestimonialManager = () => {
         {loading ? (
           <div className="col-span-full py-20 text-center">
             <RefreshCw className="w-8 h-8 text-primary-500 animate-spin mx-auto mb-4" />
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Syncing Intelligence...</p>
+            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Loading...</p>
           </div>
         ) : filteredTestimonials.length > 0 ? (
           filteredTestimonials.map((t) => (
@@ -275,7 +275,7 @@ const TestimonialManager = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Intelligence Payload (Content)</label>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Content</label>
                 <textarea
                   required
                   className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 font-bold text-navy-900 min-h-[120px] text-sm"
@@ -297,7 +297,7 @@ const TestimonialManager = () => {
               </div>
 
               <button type="submit" className="w-full py-4 bg-navy-900 text-navy-50 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-navy-900/10 hover:bg-navy-800 transition-all">
-                {editingItem ? 'Update Intelligence' : 'Authorize Publication'}
+                {editingItem ? 'Save changes' : 'Publish'}
               </button>
             </form>
           </div>

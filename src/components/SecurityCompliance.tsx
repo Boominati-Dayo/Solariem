@@ -3,7 +3,7 @@ import { ORG } from '@/lib/site';
 const CONTROLS = [
   {
     title: 'Where client money is held',
-    body: 'With Solariem, which is not a bank and does not take deposits. There is no deposit guarantee or deposit insurance behind a balance held with us, and we say so plainly because that is a real limitation rather than something to design around.',
+    body: 'With Solariem, which means we hold the balance, including money we recover for you before it reaches you. There is no deposit guarantee or deposit insurance behind it. We say so plainly because it is a real limitation rather than something to design around.',
   },
   {
     title: 'Identity checks before anything else',

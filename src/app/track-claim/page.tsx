@@ -4,13 +4,13 @@ import CaseTracker from '@/components/CaseTracker';
 import { FAQS, TIMELINE } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Track a case',
+  title: 'Check your recovery case',
   description:
-    'Check the current stage of a Solariem recovery case using the reference from your confirmation email. Shows which stage the case has reached and what is holding it up.',
+    'Use the reference from your confirmation email to see where your case has got to and what we are waiting on.',
   alternates: { canonical: '/track-claim' },
   openGraph: {
-    title: 'Track a case | Solariem',
-    description: 'See which stage your recovery case has reached and what we are waiting on.',
+    title: 'Check your recovery case | Solariem',
+    description: 'See where your case has got to and what we are waiting on.',
     url: '/track-claim',
   },
   robots: { index: false, follow: true },

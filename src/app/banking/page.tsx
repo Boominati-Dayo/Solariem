@@ -1,18 +1,16 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
-import FraudInvestigationImg from '@/assets/images_for_pages/financialfraudinvestigation.png';
 import { FAQS, FEES, ORG } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Multi-currency accounts',
+  title: 'Hold money in several currencies',
   description:
-    'Open a Solariem account and hold money in several currencies, send it abroad, and track every movement on one statement. Solariem is not a bank and does not take deposits.',
+    'Open an account, hold money in the currencies you actually use, and move it between them. No deposit guarantee covers the balance, so read the agreement first.',
   alternates: { canonical: '/banking' },
   openGraph: {
-    title: 'Multi-currency accounts | Solariem',
+    title: 'Hold money in several currencies | Solariem',
     description:
-      'Hold money in several currencies, send it abroad, and track every movement on one statement.',
+      'Hold money in the currencies you actually use, and move it between them.',
     url: '/banking',
   },
 };
@@ -60,8 +58,14 @@ const STEPS = [
 export default function BankingPage() {
   return (
     <main id="main">
-      {/* Hero */}
-      <section className="border-b border-border">
+      {/* Hero. No photograph here on purpose. There are only two usable images
+          in the repo and the other is already carrying the asset-recovery
+          hero; running the same photo through two heroes a click apart reads as
+          a stock template, which is the exact impression the rest of the page
+          is working against. The gold wash gives the section depth without a
+          second picture. Add real banking imagery and this becomes a
+          <PhotoBackdrop> too — see public/brand/README.md for the drop-in path. */}
+      <section className="wash-brand border-b border-border">
         <div className="mx-auto max-w-container px-5 py-20 sm:px-8 sm:py-28 lg:py-32">
           <div className="grid grid-cols-1 gap-x-8 gap-y-14 lg:grid-cols-12">
             <div className="lg:col-span-7">
@@ -74,9 +78,9 @@ export default function BankingPage() {
                 account open.
               </p>
               <p className="mt-5 max-w-measure text-body text-muted-foreground">
-                Solariem is not a bank and does not take deposits. Money you hold with us is not covered
-                by the FSCS, the FDIC, or any other deposit guarantee scheme. Read the account agreement
-                before you fund an account.
+                We hold your balance, including money we recover for you before it reaches you. Money
+                you hold with us is not covered by the FSCS, the FDIC, or any other deposit
+                guarantee scheme. Read the account agreement before you fund an account.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-3">
                 <Link href="/signup" className="btn-ink">
@@ -87,17 +91,27 @@ export default function BankingPage() {
                 </Link>
               </div>
             </div>
-            <div className="lg:col-span-5 lg:pt-16">
-              <figure className="border border-border bg-card p-2">
-                <Image
-                  src={FraudInvestigationImg}
-                  alt="A statement being reviewed line by line"
-                  width={1200}
-                  height={800}
-                  priority
-                  className="h-auto w-full"
-                />
-              </figure>
+            <div className="lg:col-span-5">
+              <dl className="divide-y divide-border border-y border-border">
+                <div className="py-5">
+                  <dt className="text-caption text-muted-foreground">To open an account</dt>
+                  <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
+                </div>
+                <div className="py-5">
+                  <dt className="text-caption text-muted-foreground">Monthly minimum</dt>
+                  <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
+                </div>
+                <div className="py-5">
+                  <dt className="text-caption text-muted-foreground">To keep it open</dt>
+                  <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
+                </div>
+                <div className="py-5">
+                  <dt className="text-caption text-muted-foreground">Deposit guarantee</dt>
+                  <dd className="mt-1 text-body text-foreground">
+                    None. Your balance is not covered by the FSCS, the FDIC, or any other scheme.
+                  </dd>
+                </div>
+              </dl>
             </div>
           </div>
         </div>

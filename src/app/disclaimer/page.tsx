@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { ORG, FEES } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Disclaimer',
-  description: `What ${ORG.name} information does and does not mean. Including why we cannot promise a recovery, and how to tell a real recovery firm from a fraudster.`,
+  title: 'What this site does not promise',
+  description: 'What the information on this site means, and the things we will never ask you to do. Worth reading before you send us anything.',
   alternates: { canonical: '/disclaimer' },
   openGraph: {
-    title: `Disclaimer | ${ORG.name}`,
-    description: 'What this site does and does not mean, and how to spot a recovery fraudster.',
+    title: 'What this site does not promise | Solariem',
+    description: 'What the information here means, and the things we will never ask you to do.',
     url: '/disclaimer',
   },
 };
@@ -42,9 +42,9 @@ const CLAUSES = [
   },
   {
     n: 4,
-    title: 'We are not a bank or a regulated firm',
+    title: 'Who we are, and who we are not',
     body: [
-      `${ORG.legalName} is a company that provides multi-currency accounts and asset recovery services. Its name contains the word "bank". It is not one. It is not authorised to take deposits, it is not regulated by the Financial Conduct Authority or any other prudential regulator, and it is not a firm authorised to give investment advice.`,
+      `${ORG.legalName} provides multi-currency accounts and asset recovery services. We hold money for customers, and money we recover on a case is credited to the account it belongs to. Our name contains the word "bank" because that is our registered name, not to imply anything about authorisations we hold. This page does not state which regulatory permissions we have, because we would rather you asked than read a claim we have not verified. Ask, and we will answer in writing.`,
       'Money held with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme. We are not affiliated with, and do not act for, any regulator, police force, court, bank, or government body. If you are told we are, that person is wrong.',
     ],
   },

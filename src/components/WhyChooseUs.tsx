@@ -22,7 +22,7 @@ const REASONS = [
   },
   {
     title: 'No claim of protection we cannot back',
-    body: 'Solariem is not a bank and does not take deposits, so there is no deposit guarantee scheme behind a balance held with us. We would rather you knew that up front than discovered it later.',
+    body: 'We hold your balance, and no deposit guarantee scheme stands behind it. We would rather you knew that up front than discovered it later.',
   },
   {
     title: 'Plain English, in writing',
@@ -32,7 +32,7 @@ const REASONS = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="section section-rule">
+    <section className="section section-rule wash-brand">
       <div className="mx-auto max-w-container px-5 sm:px-8">
         <header className="section-head">
           <h2 className="text-h2 text-foreground">Why people send a case here.</h2>

@@ -2,6 +2,7 @@ import { getDb } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { sendEmail, emailTemplates, getBaseTemplate } from '@/lib/email';
 import { getCurrencySymbol } from '@/lib/currencies';
+import { APP_URL } from '@/lib/env';
 
 interface NotificationData {
   title: string;
@@ -221,7 +222,7 @@ export class NotificationService {
         <p>Transaction ID: <span style="font-family: monospace;">${transactionId}</span></p>
         <p>If you believe this is an error, please contact our support team.</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=deposit" class="button">Contact Support</a>
+          <a href="${APP_URL}/dashboard?section=deposit" class="button">Contact Support</a>
         </div>
         `,
         userName
@@ -291,7 +292,7 @@ export class NotificationService {
         <p>Transaction ID: <span style="font-family: monospace;">${transactionId}</span></p>
         <p>If you believe this is an error, please contact our support team.</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=withdraw" class="button">Contact Support</a>
+          <a href="${APP_URL}/dashboard?section=withdraw" class="button">Contact Support</a>
         </div>
         `,
         userName
@@ -438,7 +439,7 @@ export class NotificationService {
         <p>You have received a reply to your support message.</p>
         <p>Please log in to your account to view the message in the support section.</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=support" class="button">View Support Inbox</a>
+          <a href="${APP_URL}/dashboard?section=support" class="button">View Support Inbox</a>
         </div>
         `,
         userName
@@ -527,7 +528,7 @@ export class NotificationService {
         <p>Congratulations! Your identity documents have been successfully verified.</p>
         <p>Your account now has full access to all features on the platform.</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+          <a href="${APP_URL}/dashboard" class="button">Go to Dashboard</a>
         </div>
         `,
         userName
@@ -562,7 +563,7 @@ export class NotificationService {
         ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
         <p>Please log in to your dashboard to resubmit clear copies of your identification documents.</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=kyc" class="button">Resubmit KYC</a>
+          <a href="${APP_URL}/dashboard?section=kyc" class="button">Resubmit KYC</a>
         </div>
         `,
         userName

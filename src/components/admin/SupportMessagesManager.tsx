@@ -141,7 +141,7 @@ const SupportMessagesManager = () => {
             <MessageSquare className="w-8 h-8 text-primary-500" />
           </div>
           <div>
-            <h3 className="text-2xl font-black uppercase tracking-tighter">Support Intelligence</h3>
+            <h3 className="text-2xl font-black uppercase tracking-tighter">Support messages</h3>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Manage participant requests & communications</p>
           </div>
         </div>
@@ -194,7 +194,7 @@ const SupportMessagesManager = () => {
                 <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-8 border border-dashed border-gray-200">
                   <MessageSquare className="w-10 h-10 text-gray-300" />
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest">No Intelligence Requests</p>
+                <p className="text-[10px] font-black uppercase tracking-widest">No messages</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -254,7 +254,7 @@ const SupportMessagesManager = () => {
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex-1">
                     <h4 className="text-xl font-black uppercase tracking-tighter text-navy-900 leading-tight pr-8">{selectedMessage.subject}</h4>
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2">Intelligence Sequence: {selectedMessage._id}</p>
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2">Message ID: {selectedMessage._id}</p>
                   </div>
                   <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm ${selectedMessage.priority === 'high' ? 'bg-red-50 text-red-500 border-red-100 animate-pulse' :
                       selectedMessage.priority === 'normal' ? 'bg-primary-50 text-primary-600 border-primary-200' :
@@ -330,7 +330,7 @@ const SupportMessagesManager = () => {
                         : 'bg-white border-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-500 hover:border-green-100'
                         }`}
                     >
-                      Archive Intelligence
+                      Archive message
                     </button>
                     <button
                       onClick={() => updateStatus(selectedMessage._id, 'open')}
@@ -363,7 +363,7 @@ const SupportMessagesManager = () => {
                 <MessageSquare className="w-16 h-16 text-gray-300" />
               </div>
               <h4 className="text-2xl font-black uppercase tracking-tighter text-navy-900">Sequence Inactive</h4>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3 max-w-[320px]">Select an Intelligence Request from the queue to initiate communication</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3 max-w-[320px]">Select a message to reply to</p>
             </div>
           )}
         </div>
@@ -376,7 +376,7 @@ const SupportMessagesManager = () => {
 const StatusIconSmall = ({ status }: { status: string }) => {
   switch (status) {
     case 'open': return <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse ring-4 ring-red-500/20" title="Active Protocol" />;
-    case 'replied': return <div className="w-2.5 h-2.5 rounded-full bg-primary-500 ring-4 ring-primary-500/20" title="Processed Intelligence" />;
+    case 'replied': return <div className="w-2.5 h-2.5 rounded-full bg-primary-500 ring-4 ring-primary-500/20" title="Replied" />;
     case 'closed': return <div className="w-2.5 h-2.5 rounded-full bg-green-500 ring-4 ring-green-500/20" title="Sequence Resolved" />;
     default: return <div className="w-2.5 h-2.5 rounded-full bg-gray-300" />;
   }

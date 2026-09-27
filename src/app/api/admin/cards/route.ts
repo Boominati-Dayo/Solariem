@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 import { requireAdmin } from '@/middleware/auth';
 import { NotificationService } from '@/lib/notifications/NotificationService';
 import { generateCardNumber, generateCVV, generateExpiryDate } from '@/lib/utils/cardUtils';
+import { APP_URL } from '@/lib/env';
 import { sendEmail, emailTemplates } from '@/lib/email';
 
 export const GET = requireAdmin(async (request, context) => {
@@ -102,7 +103,7 @@ export const PUT = requireAdmin(async (request, context) => {
             <p>Your request for a <strong>${card.cardLevel} ${card.cardType}</strong> virtual card has been approved.</p>
             <p>Your card is now ready for use. You can securely access your full card details, including the card number and CVV, directly from your dashboard.</p>
             <div style="margin: 20px 0;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="background-color: #0E5A50; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Your Card</a>
+              <a href="${APP_URL}/dashboard" style="background-color: #0E5A50; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Your Card</a>
             </div>
             <p>If you did not request this card, please contact our support team immediately.</p>
             <p>Best regards,<br/>The Solariem Team</p>

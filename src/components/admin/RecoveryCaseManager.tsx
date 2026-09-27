@@ -113,7 +113,7 @@ const RecoveryCaseManager = () => {
       });
       const data = await res.json();
       if (data.success) {
-        showSuccess('Case intelligence updated');
+        showSuccess('Case updated');
         setIsModalOpen(false);
         fetchCases();
       } else {
@@ -127,7 +127,7 @@ const RecoveryCaseManager = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Authorise permanent removal of this recovery intelligence?')) return;
+    if (!confirm('Delete this case permanently? This cannot be undone.')) return;
     try {
       const res = await fetch(`/api/admin/recovery/${id}`, { method: 'DELETE' });
       const data = await res.json();
@@ -169,7 +169,7 @@ const RecoveryCaseManager = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-xl font-black text-navy-900 uppercase tracking-tight">Recovery Intelligence OPS</h2>
+          <h2 className="text-xl font-black text-navy-900 uppercase tracking-tight">Recovery cases</h2>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Global Asset Tracking & Repatriation</p>
         </div>
         <div className="flex items-center gap-4">
@@ -191,7 +191,7 @@ const RecoveryCaseManager = () => {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
           type="text"
-          placeholder="Filter Intelligence (User, Platform, Scam Type)..."
+          placeholder="Filter cases (customer, platform, scam type)"
           className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all font-bold text-xs uppercase tracking-wider"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -267,7 +267,7 @@ const RecoveryCaseManager = () => {
         ) : (
           <div className="py-20 text-center bg-white rounded-3xl border border-gray-50">
             <Clipboard className="w-12 h-12 text-gray-100 mx-auto mb-4" />
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">No intelligence packets detected</p>
+            <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">No cases found</p>
           </div>
         )}
       </div>
@@ -370,7 +370,7 @@ const RecoveryCaseManager = () => {
                         <option value="funds_frozen">Assets Locked/Frozen</option>
                         <option value="approved">Approved & Ready</option>
                         <option value="completed">Recovery Finalized (Payout)</option>
-                        <option value="rejected">Intelligence Rejected</option>
+                        <option value="rejected">Rejected</option>
                       </select>
                     </div>
 
@@ -432,7 +432,7 @@ const RecoveryCaseManager = () => {
                       disabled={isUpdating}
                       className="w-full h-14 bg-navy-900 text-navy-50 rounded-xl font-black uppercase tracking-[0.2em] shadow-xl shadow-navy-900/10 hover:bg-navy-800 transition-all flex items-center justify-center gap-3"
                     >
-                      {isUpdating ? <RefreshCcw className="w-5 h-5 animate-spin" /> : 'Authorise Intelligence Update'}
+                      {isUpdating ? <RefreshCcw className="w-5 h-5 animate-spin" /> : 'Save changes'}
                     </button>
                   </div>
 

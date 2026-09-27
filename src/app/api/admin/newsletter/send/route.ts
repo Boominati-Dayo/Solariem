@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { sendEmail } from '@/lib/email';
 import { requireAdmin } from '@/middleware/auth';
+import { APP_URL } from '@/lib/env';
 
 /**
  * Admin-only. This was previously an open mail relay: the file carried a
@@ -58,7 +59,7 @@ export const POST = requireAdmin(async (req, context) => {
               <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
               <p style="color: #666; font-size: 12px;">
                 You are receiving this email because you subscribed to the Solariem newsletter.
-                <a href="${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?email=${subscriber.email}">Unsubscribe</a>
+                <a href="${APP_URL}/unsubscribe?email=${subscriber.email}">Unsubscribe</a>
               </p>
             </div>
           `,

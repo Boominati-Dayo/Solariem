@@ -1,16 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FAQS, FEES, TIMELINE } from '@/lib/site';
+import PhotoBackdrop from '@/components/PhotoBackdrop';
+import FraudInvestigationImg from '@/assets/images_for_pages/financialfraudinvestigation.png';
 
 export const metadata: Metadata = {
-  title: 'Asset recovery',
+  title: 'Lost money to a fraud? Start a case',
   description:
-    'Solariem traces money lost to fraud and acts on it through banks, exchanges and the courts. No recovery fee is due unless funds actually arrive. A fee of 15–25% applies then. We cannot guarantee a result.',
+      'Tell us what happened and we will say whether the money can be traced. No fee unless money actually comes back, then 15-25%. We cannot promise a result.',
   alternates: { canonical: '/asset-recovery' },
   openGraph: {
-    title: 'Asset recovery | Solariem',
+    title: 'Lost money to a fraud? Start a case | Solariem',
     description:
-      'We trace fraudulent transfers and act on them through the institutions involved. No recovery fee unless funds come back.',
+      'Tell us what happened and we will say whether the money can be traced. No fee unless money actually comes back.',
     url: '/asset-recovery',
   },
 };
@@ -41,8 +43,19 @@ const AGAINST_US = [
 export default function AssetRecoveryPage() {
   return (
     <main id="main">
-      {/* Hero */}
-      <section className="border-b border-border">
+      {/* Hero. The photograph carries the section; the scrim is anchored left
+          so the copy always lands on the solid part whatever is in the image.
+          The fee table is the one thing here with an opaque background of its
+          own (--card is solid white in light, near-solid ink in dark), which is
+          what makes it safe to float it over the photo. */}
+      <PhotoBackdrop
+        image={FraudInvestigationImg}
+        scrim="left"
+        strength="light"
+        position="center right"
+        priority
+        className="border-b border-border"
+      >
         <div className="mx-auto max-w-container px-5 py-20 sm:px-8 sm:py-28 lg:py-32">
           <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
             <div className="lg:col-span-7">
@@ -71,7 +84,7 @@ export default function AssetRecoveryPage() {
             </div>
 
             <div className="lg:col-span-5 lg:pt-12">
-              <div className="border border-border">
+              <div className="border border-border bg-card">
                 <div className="border-b border-border bg-muted px-6 py-4">
                   <h2 className="text-body-sm font-medium text-foreground">The fee, in full</h2>
                 </div>
@@ -97,7 +110,7 @@ export default function AssetRecoveryPage() {
             </div>
           </div>
         </div>
-      </section>
+      </PhotoBackdrop>
 
       {/* Process */}
       <section className="section section-rule">

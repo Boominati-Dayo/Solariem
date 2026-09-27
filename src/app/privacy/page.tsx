@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ORG, SITE_URL } from '@/lib/site';
+import { ORG } from '@/lib/site';
+import { SITE_URL } from '@/lib/env';
 
 export const metadata: Metadata = {
-  title: 'Privacy',
-  description: `How ${ORG.name} collects, uses, shares and stores your personal information, and what you can ask us to do with it.`,
+  title: 'What we hold about you, and why',
+  description: 'What we collect, why we collect it, who else sees it, and how to ask us to delete it. Written to be read rather than to be agreed to.',
   alternates: { canonical: '/privacy' },
   openGraph: {
-    title: `Privacy | ${ORG.name}`,
-    description: 'What we collect, why we collect it, who we share it with, and how to make us delete it.',
+    title: 'What we hold about you, and why | Solariem',
+    description: 'What we collect, why we collect it, who else sees it, and how to ask us to delete it.',
     url: '/privacy',
   },
 };

@@ -13,14 +13,14 @@ import SecurityCompliance from '@/components/SecurityCompliance';
 import FinalCTA from '@/components/FinalCTA';
 
 export const metadata: Metadata = {
-  title: 'Solariem | Multi-currency accounts and asset recovery',
+  title: 'Solariem | Trace money lost to fraud, hold what you keep',
   description:
-    'Multi-currency accounts, and a practice that traces money taken by fraud. No recovery fee unless funds actually arrive. You pay 15–25% only then.',
+      'We trace money taken by fraud through the banks that moved it, and hold balances in several currencies. You pay 15-25% only when money actually reaches you.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Solariem | Multi-currency accounts and asset recovery',
+    title: 'Solariem | Trace money lost to fraud, hold what you keep',
     description:
-      'Multi-currency accounts, and a practice that traces money taken by fraud. No recovery fee unless funds actually arrive.',
+      'We trace money taken by fraud through the banks that moved it. You pay 15-25% only when money actually reaches you.',
     url: '/',
   },
 };

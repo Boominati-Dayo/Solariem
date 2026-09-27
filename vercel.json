@@ -7,13 +7,7 @@
   "env": {
     "NODE_ENV": "production",
     "NODE_OPTIONS": "--max-old-space-size=4096"
-  },
-  "crons": [
-    {
-      "path": "/api/investments/process-daily-gains",
-      "schedule": "0 0 * * *"
-    }
-  ]
+  }
 }
 
 

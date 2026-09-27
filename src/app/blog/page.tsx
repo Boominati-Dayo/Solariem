@@ -20,13 +20,13 @@ import { ORG } from '@/lib/site';
  */
 
 export const metadata: Metadata = {
-  title: 'Journal',
-  description: `Written material from ${ORG.name} on fraud, tracing and recovery: what actually happens after you lose money, what the deadlines are, and how to tell a real firm from a fake one.`,
+  title: 'What happens after you lose money to a scam',
+  description: 'Plain answers on fraud, tracing and recovery: the deadlines that matter, who to contact, and how recovery scammers find people who have already been scammed.',
   alternates: { canonical: '/blog' },
   openGraph: {
-    title: `Journal | ${ORG.name}`,
+    title: 'What happens after you lose money to a scam | Solariem',
     description:
-      'What happens after you lose money to fraud, what the deadlines are, and how recovery scams work.',
+      'The deadlines that matter, who to contact, and how recovery scammers find people who have already been scammed.',
     url: '/blog',
   },
 };

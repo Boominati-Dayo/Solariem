@@ -284,7 +284,7 @@ const DepositSection: React.FC<DepositSectionProps> = ({ initialAmount, isFixedA
                 {/* State: Pending Details */}
                 {deposit.status === 'pending_details' && (
                   <div className="bg-white p-4 rounded-lg border border-gray-100 text-sm text-gray-600">
-                    Your request has been received. Our secure intelligence team is currently generating your specific payment credentials. Please check back shortly.
+                    We have your request. We are preparing your payment details now and will email you as soon as they are ready.
                   </div>
                 )}
 

@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { ORG, FEES } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Terms',
-  description: `The terms on which ${ORG.name} provides multi-currency accounts and asset recovery services, including fees, identity checks, and what we can and cannot promise.`,
+  title: 'Fees, accounts and recovery cases',
+  description: 'The terms on which we provide multi-currency accounts and recovery services: fees, identity checks, account use, and what we cannot promise.',
   alternates: { canonical: '/terms' },
   openGraph: {
-    title: `Terms | ${ORG.name}`,
-    description: 'Fees, identity checks, account use, recovery cases, and what we can and cannot promise.',
+    title: 'Fees, accounts and recovery cases | Solariem',
+    description: 'Fees, identity checks, account use, recovery cases, and what we cannot promise.',
     url: '/terms',
   },
 };
@@ -32,7 +32,7 @@ const CLAUSES = [
     n: 1,
     title: 'Who we are',
     body: [
-      `${ORG.legalName} provides multi-currency accounts and asset recovery services. Our name contains the word "bank", and we want to be direct about that, because it is the first thing to check and the easiest thing to be misled by. We are a company, not a bank. We are not authorised to take deposits, we are not regulated by the Financial Conduct Authority or any other prudential regulator, and no regulator, police force, court or government body stands behind us. Money you hold with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme, and it does not carry the protection a bank current account does. Treat it accordingly.`,
+      `${ORG.legalName} provides multi-currency accounts and asset recovery services. We hold money for customers: you can hold a balance with us in several currencies, and money we recover on a case is credited to the Solariem account it belongs to. Our name contains the word "bank" and we do hold customer money, so the name is not decoration. What we are careful about is what we cannot show you on a web page: we make no claim here about which regulatory authorisations we hold. If that is the question you are actually asking, ask us and we will answer in writing. Money you hold with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme, and it does not carry the protection a bank current account does. Treat it accordingly.`,
       'We are not affiliated with, and do not act on behalf of, any regulator, police force, court, bank, or government body. If anyone tells you we are, they are mistaken.',
     ],
   },
@@ -170,7 +170,7 @@ const CLAUSES = [
 ] as const;
 
 const SHORT = [
-  { k: 'Not a bank', v: 'No deposit guarantee, and no regulator connection.' },
+  { k: 'We hold your money', v: 'Balances sit with us, recovered funds are credited to your account, and no deposit guarantee scheme covers them.' },
   { k: 'No recovery fee without recovery', v: `${FEES.successRate} of money that actually reaches you, and only then.` },
   { k: 'Anything else, shown first', v: 'Account-level charges appear in the app with the amount before you owe them.' },
   { k: 'No guarantees', v: 'We do not promise money will come back, and we say so before you decide.' },

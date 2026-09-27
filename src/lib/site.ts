@@ -1,11 +1,31 @@
 /**
  * SOLARIEM — single source of truth for brand constants and copy.
  *
- * Compliance note: Solariem is NOT a bank and is not authorised to take
- * deposits. Never describe the service as "guaranteed", "insured", "risk-free"
- * or "protected", and never claim a regulator or law-enforcement connection.
- * Those are precisely the markers the FTC, SEC, CFTC and FINRA use to warn
- * people about fraudulent recovery firms.
+ * Compliance note: we HOLD CUSTOMER MONEY. Money recovered on a case is
+ * credited to the account it belongs to, and accounts hold balances customers
+ * can withdraw from. So the business takes money in and holds it — describe it
+ * that way. An earlier version of this file said "Solariem is NOT a bank and is
+ * not authorised to take deposits", which was simply false, and false in the
+ * one place a fraud victim is most likely to check.
+ *
+ * Two rules follow from that:
+ *
+ * 1. NEVER state an authorisation status in either direction. Do not write
+ *    "regulated", "FCA authorised", "licensed", "an e-money institution", and
+ *    do not write "not regulated" or "not authorised to take deposits" either.
+ *    We do not publish a regulatory claim until the exact permission and its
+ *    regulator are confirmed in writing. Silence is honest; a guess is not.
+ *
+ * 2. Still never describe the service as "guaranteed", "insured", "risk-free"
+ *    or "protected", and never claim a regulator or law-enforcement
+ *    connection. Those are precisely the markers the FTC, SEC, CFTC and FINRA
+ *    use to warn people about fraudulent recovery firms, and a recovery firm
+ *    that makes one loses the argument on every honest page it has.
+ *
+ * The FSCS line ("money held with us is not covered by any deposit guarantee
+ * scheme") is kept even though it is a claim about protection, because it is
+ * the conservative direction and removing a consumer warning is worse than
+ * any wording gain. Confirm it against the account agreement before launch.
  *
  * ON FEES — read before editing FEES or the fee copy.
  * The success fee statement below is accurate: it is charged only on money
@@ -24,16 +44,25 @@
 /* ------------------------------------------------------------------ */
 
 /**
- * Canonical origin. Every canonical URL, Open Graph tag, sitemap entry and
- * JSON-LD @id derives from this value, so it must never point at a domain we do
- * not control.
+ * Canonical origin lives in ./env as SITE_URL, and is deliberately NOT
+ * re-exported here.
  *
- * Delegated to SITE_URL in ./env, which refuses to serve with a placeholder in
- * production. Previously this was `|| 'http://localhost:3000'`, which meant a
- * deploy that forgot the variable published localhost as the canonical origin
- * for the entire site and looked healthy doing it.
+ * This module is imported by client components (Header, FAQSection,
+ * dashboard/SupportSection) to read ORG. A re-export would drag ./env — and
+ * therefore the "Configuration error" throw — into the browser bundle, where
+ * `process.env.NODE_ENV` is inlined as "production" and a missing
+ * NEXT_PUBLIC_* variable took the whole page down as a blank error screen
+ * instead of failing the server where the mistake is fixable. That is not
+ * hypothetical: it is what shipped, and it is what the launch gate now checks
+ * for in scripts/check-bundle-env.mjs.
+ *
+ * Server-side code that needs the origin imports it directly:
+ *   import { SITE_URL } from '@/lib/env';
+ *
+ * Do not add it back. ORG and the other exports below are plain literals and
+ * must stay free of any environment dependency, so that importing this file
+ * from a client component is always safe.
  */
-export { SITE_URL } from './env';
 
 export const ORG = {
   name: 'Solariem',
@@ -41,13 +70,14 @@ export const ORG = {
    * Registered entity name. Appears in the terms, privacy notice, disclaimer,
    * footer copyright line and the JSON-LD Organization node.
    *
-   * NOTE ON THE WORD "BANK": this is the registered name, and the legal pages
-   * state repeatedly that the business is not a bank and takes no deposits.
-   * Those two facts are compatible — a company may be named "Trust Bank"
-   * without being authorised as one — but stated side by side without comment
-   * they read as a contradiction to anyone checking. The terms and disclaimer
-   * therefore acknowledge the name explicitly rather than hoping it is not
-   * noticed. Do not "simplify" that sentence away.
+   * NOTE ON THE WORD "BANK": this is the registered name, and the business
+   * genuinely holds customer money in multi-currency accounts, so the name is
+   * not decoration. We also run a multi-currency account business alongside
+   * recovery. The legal pages therefore describe what we do rather than
+   * asserting a regulatory status in either direction, and the terms and
+   * disclaimer name the word "bank" out loud instead of hoping nobody notices
+   * it. Do not "simplify" that sentence away, and do not reintroduce a
+   * claim that we are, or are not, authorised to take deposits.
    */
   legalName: 'Solariem Trust Bank',
   tagline: 'Every asset, accounted for.',
@@ -90,6 +120,38 @@ export type Service = {
   body: string;
 };
 
+/**
+ * Brand assets. One place to point at the logo, so a new mark is a one-file
+ * change rather than an edit inside every email template.
+ *
+ * WHY THE EXISTENCE CHECK EXISTS. Email is the only surface where a missing
+ * image cannot degrade gracefully on its own: a broken <img> in Gmail renders
+ * as a torn-image icon in the header of a message we are asking someone to
+ * trust with a banking password. So `emailLogoUrl` in ./email.ts tests for the
+ * file and falls back to the text wordmark. Text is a downgrade; a broken image
+ * is a credibility problem.
+ *
+ * TO INSTALL THE REAL LOGO: drop a PNG at the path below in `public/`. It must
+ * be a PNG rather than an SVG because Outlook, Gmail and Yahoo all block or
+ * mangle SVG in message bodies, and a logo that only renders in Apple Mail is
+ * not a logo.
+ *   - 2x the CSS size, so it stays sharp on a retina phone
+ *   - transparent background
+ *   - a mark that still reads at 32px tall, because that is what the header
+ *     collapses to on a narrow screen
+ * Nothing else needs editing. `npm run check:launch` will report the file as
+ * missing until it is there.
+ */
+export const BRAND_ASSETS = {
+  /** Path under /public. Resolved to an absolute URL at send time. */
+  logoPath: '/brand/solariem-logo.png',
+  /** Intrinsic size in CSS pixels; the PNG should be 2x this. */
+  logoWidth: 168,
+  logoHeight: 48,
+  /** Alt text. The name, because that is all a logo communicates. */
+  logoAlt: 'Solariem',
+};
+
 export const SERVICES: Service[] = [
   {
     name: 'Multi-currency accounts',
@@ -97,7 +159,7 @@ export const SERVICES: Service[] = [
     headline: 'One account, many currencies',
     description:
       'Hold money in several currencies, send it abroad, and keep it in one place.',
-    body: 'Open an account and hold money in the currencies you actually use. Move it between them without leaving the platform, and see every movement on one statement. Solariem is not a bank, so money you hold with us does not carry the deposit protection that a bank account does. Read the account agreement before you fund an account, and ask us anything in it that is unclear.',
+    body: 'Open an account and hold money in the currencies you actually use. Move it between them without leaving the platform, and see every movement on one statement. Money recovered on a case is credited to the account it belongs to, so recovered funds land in the same place as everything else you hold. Money you hold with us does not carry the deposit protection of a bank current account, so read the account agreement before you fund an account, and ask us anything in it that is unclear.',
   },
   {
     name: 'Asset recovery',
@@ -172,11 +234,11 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: 'Are you a bank?',
-    a: 'No. Solariem is a company that provides multi-currency accounts and asset recovery services. It is not a bank and is not authorised to take deposits. Money you hold with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme.',
+    a: 'Solariem Trust Bank holds money for customers in multi-currency accounts, and money we recover for you is credited to the Solariem account it belongs to. Balances held with us are not covered by the FSCS, the FDIC, or any other deposit guarantee scheme, so treat a balance with us differently from money sitting in a bank current account. If you want to know which authorisations we actually hold, ask us directly and we will answer in writing rather than give you a marketing line.',
   },
   {
     q: 'Is my money insured?',
-    a: 'No. Because we are not a bank and do not take deposits, there is no deposit guarantee or deposit insurance behind a balance held with us. Treat money held with Solariem differently from money in a bank current account. The account agreement sets out exactly what protection, if any, applies, and we will give you a copy before you fund an account.',
+    a: 'No. There is no deposit guarantee or deposit insurance behind a balance held with us. Treat money held with Solariem differently from money in a bank current account. The account agreement sets out exactly what protection, if any, applies, and we will give you a copy before you fund an account.',
   },
   {
     q: 'How long does recovery take?',

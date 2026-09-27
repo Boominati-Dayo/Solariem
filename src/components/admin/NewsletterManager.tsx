@@ -51,7 +51,7 @@ export default function NewsletterManager() {
                     <Mail className="w-8 h-8 text-primary-500" />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black uppercase tracking-tighter">Broadcast Intelligence</h2>
+                    <h2 className="text-2xl font-black uppercase tracking-tighter">Email broadcast</h2>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Global dissemination of secure updates</p>
                 </div>
             </div>
@@ -85,7 +85,7 @@ export default function NewsletterManager() {
 
                 <div className="group">
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-primary-500 transition-colors">
-                        Intelligence Payload (HTML Supported)
+                        Email content (HTML allowed)
                     </label>
                     <div className="relative">
                         <textarea

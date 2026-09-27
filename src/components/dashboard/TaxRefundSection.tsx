@@ -55,7 +55,7 @@ const TrackingView = ({ onBack }: { onBack: () => void }) => {
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mobile:mb-12">
             <div>
-              <h3 className="text-2xl mobile:text-3xl font-black text-navy-900 uppercase tracking-tight mb-2">Refund Intelligence Tracking</h3>
+              <h3 className="text-2xl mobile:text-3xl font-black text-navy-900 uppercase tracking-tight mb-2">Refund status</h3>
               <p className="text-gray-500 text-xs mobile:text-sm">Monitor the forensic validation of your tax assets</p>
             </div>
             <div className="flex items-center self-start md:self-auto gap-3 px-4 py-2 bg-navy-900 rounded-2xl border border-navy-800 shadow-lg shadow-navy-900/10">
@@ -116,7 +116,7 @@ const TrackingView = ({ onBack }: { onBack: () => void }) => {
                       <div className="relative flex justify-between items-center px-4">
                         {[
                           { label: 'Transmission', active: true, done: true },
-                          { label: 'Intelligence Audit', active: refund.status !== 'pending', done: refund.status !== 'pending' && refund.status !== 'processing' },
+                          { label: 'Checking your claim', active: refund.status !== 'pending', done: refund.status !== 'pending' && refund.status !== 'processing' },
                           { label: 'Asset Release', active: refund.status === 'approved' || refund.status === 'rejected', done: refund.status === 'approved' || refund.status === 'rejected' }
                         ].map((step, i) => (
                           <div key={i} className="flex flex-col items-center gap-4 relative z-10">
@@ -135,7 +135,7 @@ const TrackingView = ({ onBack }: { onBack: () => void }) => {
                     <div className="mobile:hidden space-y-4">
                       {[
                         { label: 'Secure Transmission', active: true, done: true, desc: 'Encrypted packet sent to retrieval ledger.' },
-                        { label: 'Forensic Intelligence Audit', active: refund.status !== 'pending', done: refund.status !== 'pending' && refund.status !== 'processing', desc: 'Authorised verification of tax assets.' },
+                        { label: 'Verifying your refund', active: refund.status !== 'pending', done: refund.status !== 'pending' && refund.status !== 'processing', desc: 'We are checking the refund details.' },
                         { label: 'Authorised Asset Release', active: refund.status === 'approved' || refund.status === 'rejected', done: refund.status === 'approved' || refund.status === 'rejected', desc: 'Release of confirmed tax refund sum.' }
                       ].map((step, i) => (
                         <div key={i} className="flex gap-4">

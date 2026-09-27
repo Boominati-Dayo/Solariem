@@ -4,13 +4,13 @@ import ContactForm from '@/components/ContactForm';
 import { ORG } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'Contact',
-  description: `Contact ${ORG.name}. Tell us what happened and we will tell you whether the money is recoverable. No charge for that answer.`,
+  title: 'Start with what actually happened',
+  description: 'Tell us what happened to your money. We will tell you whether it can be traced, and there is no charge for that answer.',
   alternates: { canonical: '/contact' },
   openGraph: {
-    title: `Contact ${ORG.name}`,
+    title: 'Start with what actually happened | Solariem',
     description:
-      'Tell us what happened and we will tell you whether the money is recoverable. No charge for that answer.',
+      'Tell us what happened to your money. We will tell you whether it can be traced, and there is no charge for that answer.',
     url: '/contact',
   },
 };
@@ -139,10 +139,10 @@ export default function ContactPage() {
               <div className="border border-border bg-muted p-6">
                 <h2 className="text-h4 text-foreground">Something to be clear about</h2>
                 <p className="mt-3 text-body-sm text-muted-foreground">
-                  We are not a bank, we are not affiliated with any regulator or police force, and we
-                  do not have special access to any of them. We will never ask you to keep a case
-                  secret from your own lawyer, your bank, or your family. Legitimate firms have
-                  nothing to hide from advisers.
+                  We are not affiliated with any regulator or police force, and we do not have
+                  special access to any of them. We will never ask you to keep a case secret from
+                  your own lawyer, your bank, or your family. Legitimate firms have nothing to hide
+                  from advisers.
                 </p>
                 <Link href="/asset-recovery" className="btn-quiet mt-6 -ml-6">
                   What we will never do

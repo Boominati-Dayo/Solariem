@@ -6,7 +6,8 @@ import { PinPromptProvider } from '@/components/dashboard/PinPrompt';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import ConditionalLayout from '@/components/ConditionalLayout';
 import { Toaster } from 'react-hot-toast';
-import { SITE_URL, ORG, SERVICES, FAQS } from '@/lib/site';
+import { ORG, SERVICES, FAQS } from '@/lib/site';
+import { SITE_URL } from '@/lib/env';
 import './globals.css';
 
 const geist = Geist({
@@ -31,9 +32,15 @@ const instrumentSerif = Instrument_Serif({
   display: 'swap',
 });
 
-const TITLE = 'Solariem | Multi-Currency Accounts and Asset Recovery';
+// The default title and description. `default` is what a page with no
+// metadata of its own renders, and the same pair is reused for the OG and
+// Twitter blocks further down, so it is written once here on purpose.
+//
+// Same copy as src/app/page.tsx. Homepage pages set an absolute title, so
+// this text is really for the 404 and any page that forgets.
+const TITLE = 'Solariem | Trace money lost to fraud, hold what you keep';
 const DESCRIPTION =
-  'Solariem provides multi-currency accounts and traces fraudulent transfers through the institutions involved. No recovery fee unless funds actually arrive.';
+  'We trace money taken by fraud through the banks that moved it, and hold balances in several currencies. You pay 15-25% only when money actually reaches you.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

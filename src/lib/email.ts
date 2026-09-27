@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { getCurrencySymbol } from '@/lib/currencies';
-import { SITE_URL, ORG } from '@/lib/site';
+import { ORG, BRAND_ASSETS } from '@/lib/site';
 import { requireEnv, APP_URL } from '@/lib/env';
 
 interface EmailOptions {
@@ -81,6 +83,25 @@ export const getBaseTemplate = (title: string, content: string, userName?: strin
   // has a real one to check against. Kept in sync with the site by importing
   // ORG rather than repeating the string in a template.
   const SUPPORT_EMAIL = ORG.email;
+
+  // ---- the logo ---------------------------------------------------------
+  // Resolved once per process, not per email. `public/` is resolved relative
+  // to process.cwd(), which is correct on Vercel and locally, and this module
+  // is server-only so there is no browser case to worry about.
+  //
+  // The fallback matters. A missing <img> in a transactional email renders as
+  // a torn-image icon at the top of a message we are asking someone to trust
+  // with a banking password, and the images most likely to be blocked are the
+  // ones we control (SVG, webp). So: check, and fall back to the text
+  // wordmark. Drop a PNG at BRAND_ASSETS.logoPath and it starts being used
+  // with no code change. `npm run check:launch` reports it until then.
+  const logoFile = join(process.cwd(), 'public', BRAND_ASSETS.logoPath);
+  const hasLogo = existsSync(logoFile);
+  const logoSrc = `${APP_URL}${BRAND_ASSETS.logoPath}`;
+
+  const brandMark = hasLogo
+    ? `<img src="${logoSrc}" width="${BRAND_ASSETS.logoWidth}" height="${BRAND_ASSETS.logoHeight}" alt="${BRAND_ASSETS.logoAlt}" style="display:block;height:auto;max-width:100%;width:${BRAND_ASSETS.logoWidth}px;margin:0 auto;border:0;outline:none;text-decoration:none;" />`
+    : `<div class="footer-logo">${appName}</div>`;
 
   return `
     <!DOCTYPE html>
@@ -203,7 +224,7 @@ export const getBaseTemplate = (title: string, content: string, userName?: strin
     <body>
       <div class="container">
         <div class="header">
-          <div class="footer-logo">${appName}</div>
+          ${brandMark}
         </div>
         
         <div class="content">
@@ -244,8 +265,8 @@ export const emailTemplates = {
     html: getBaseTemplate(
       'Verify Your Email',
       `
-      <p>Welcome to Solariem! We're excited to have you on board.</p>
-      <p>To get started and access all our private banking features, please verify your email address by clicking the button below:</p>
+      <p>Please confirm your email address so we know it is really yours.</p>
+      <p>Click the button below to confirm it. It takes a second, and you will not be able to sign in until you do.</p>
       <div class="button-container">
         <a href="${verifyUrl}" class="button">Verify Email Address</a>
       </div>
@@ -278,26 +299,25 @@ export const emailTemplates = {
 
   // 3. Welcome (Sign up)
   welcome: (userName: string) => ({
-    subject: 'Welcome to Solariem! 🚀',
+    subject: 'Welcome to Solariem',
     html: getBaseTemplate(
-      'Welcome Aboard!',
+      'Welcome to Solariem',
       `
-      <p>Your account has been successfully created. We're thrilled to have you join our community!</p>
-      <p>With Solariem, you can:</p>
+      <p>Your account is ready. Here is what you can do with it:</p>
       <ul>
-        <li>Securely hold and manage assets</li>
-        <li>Track recovery progress in real-time</li>
-        <li>Access private wealth management tools</li>
-        <li>Connect with 24/7 dedicated advisors</li>
+        <li>Hold money in several currencies and move it between them</li>
+        <li>See your balance and every transaction on one statement</li>
+        <li>Report a fraud and follow your case as it moves along</li>
+        <li>Message us from the dashboard</li>
       </ul>
-      <p>Ready to start your journey?</p>
+      <p>Ready to get started?</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+        <a href="${APP_URL}/dashboard" class="button">Go to Dashboard</a>
       </div>
       `,
       userName
     ),
-    text: `Hello ${userName}, Welcome to Solariem! Your account has been created successfully.`
+    text: `Hello ${userName}, your Solariem account is ready. Sign in here: ${APP_URL}/login`
   }),
 
   // 4. Deposit Confirmation
@@ -318,7 +338,7 @@ export const emailTemplates = {
       </table>
       ${status === 'approved' ? '<p>You can now use these funds within your private account features.</p>' : '<p>We will notify you once your deposit has been approved.</p>'}
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">View Dashboard</a>
+        <a href="${APP_URL}/dashboard" class="button">View Dashboard</a>
       </div>
       `,
       userName
@@ -345,7 +365,7 @@ export const emailTemplates = {
       </table>
       <p>Expect your funds to reach your provided destination shortly after approval.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">View Dashboard</a>
+        <a href="${APP_URL}/dashboard" class="button">View Dashboard</a>
       </div>
       `,
       userName
@@ -369,7 +389,7 @@ export const emailTemplates = {
         <tr><td>Date:</td><td>${new Date().toLocaleDateString()}</td></tr>
       </table>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Check Balance</a>
+        <a href="${APP_URL}/dashboard" class="button">Check Balance</a>
       </div>
       `,
       userName
@@ -396,7 +416,7 @@ export const emailTemplates = {
       </table>
       <p>Please log in to the admin dashboard to process this request.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=admin" class="button">Admin Dashboard</a>
+        <a href="${APP_URL}/dashboard?section=admin" class="button">Admin Dashboard</a>
       </div>
       `,
       'Admin'
@@ -405,7 +425,7 @@ export const emailTemplates = {
     };
   },
 
-  // 8. Broadcast Intelligence
+  // 8. Broadcast email
   broadcastEmail: (subject: string, htmlContent: string) => ({
     subject: subject,
     html: getBaseTemplate(
@@ -415,26 +435,26 @@ export const emailTemplates = {
         ${htmlContent}
       </div>
       <p style="font-size: 10px; color: #9ca3af; margin-top: 40px; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">
-        Transmission Authorised by Global Wealth Management Intelligence
+        Sent by Solariem
       </p>
       `
     ),
-    text: `Solariem Intelligence Update: ${subject}`
+    text: `Solariem update: ${subject}`
   }),
 
   // 13. Support Response Protocol
   supportResponse: (userName: string, subject: string, reply: string) => ({
     subject: `Secure Response: ${subject} - Solariem`,
     html: getBaseTemplate(
-      'Authorised Intelligence Response',
+      'We have received your message',
       `
-      <p>A secure response has been authorised for your enquiry: <strong>${subject}</strong></p>
+      <p>You asked: <strong>${subject}</strong></p>
       <div style="background-color: #F5F4F0; padding: 25px; border-radius: 12px; border: 1px solid #E6E4DE; margin: 30px 0;">
         <p style="margin: 0; font-size: 15px; color: #14130F; line-height: 1.6;">${reply}</p>
       </div>
-      <p>If you require further assistance, please log in to your dashboard and initiate a follow-up sequence.</p>
+      <p>If you need to reply, send us a message from your dashboard.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=support" class="button">View Communications</a>
+        <a href="${APP_URL}/dashboard?section=support" class="button">View Communications</a>
       </div>
       `,
       userName
@@ -448,21 +468,21 @@ export const emailTemplates = {
     html: getBaseTemplate(
       'Recovery Claim Filed',
       `
-      <p>Your forensic briefing has been received and logged into our secure registry.</p>
+      <p>We have your report. Nothing else is needed from you right now.</p>
       <table class="data-table">
         <tr><td>Claim Number:</td><td class="highlight">${claimNumber}</td></tr>
         <tr><td>Scam Type:</td><td>${scamType}</td></tr>
         <tr><td>Status:</td><td>PENDING REVIEW</td></tr>
         <tr><td>Date Filed:</td><td>${new Date().toLocaleDateString()}</td></tr>
       </table>
-      <p>Our intelligence division will begin a preliminary audit of your case. You can track your claim progress using your email and claim number.</p>
+      <p>We will start by reviewing your case. You can track progress using the email address and claim number we sent you.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/track-claim" class="button">Track Your Claim</a>
+        <a href="${APP_URL}/track-claim" class="button">Track Your Claim</a>
       </div>
       `,
       userName
     ),
-    text: `Hello ${userName}, your recovery claim #${claimNumber} for ${scamType} has been received. Track it here: ${process.env.NEXT_PUBLIC_APP_URL}/track-claim`
+    text: `Hello ${userName}, your recovery claim #${claimNumber} for ${scamType} has been received. Track it here: ${APP_URL}/track-claim`
   }),
 
   // 15. Recovery Claim Admin Alert
@@ -473,7 +493,7 @@ export const emailTemplates = {
     html: getBaseTemplate(
       'New Recovery Briefing',
       `
-      <p>A new fraud recovery claim has been transmitted for forensic evaluation.</p>
+      <p>A new recovery claim has come in and needs a first read.</p>
       <table class="data-table">
         <tr><td>User Email:</td><td>${userEmail}</td></tr>
         <tr><td>Claim Number:</td><td>${claimNumber}</td></tr>
@@ -481,9 +501,9 @@ export const emailTemplates = {
         <tr><td>Amount Lost:</td><td class="highlight">${sym}${amount.toLocaleString()}</td></tr>
         <tr><td>Timestamp:</td><td>${new Date().toLocaleString()}</td></tr>
       </table>
-      <p>Immediate officer assignment is recommended for this asset repatriation protocol.</p>
+      <p>Worth assigning someone to this one quickly.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=admin" class="button">Admin Dashboard</a>
+        <a href="${APP_URL}/dashboard?section=admin" class="button">Admin Dashboard</a>
       </div>
       `,
       'Forensic Admin'
@@ -494,11 +514,11 @@ export const emailTemplates = {
 
   // 16. Recovery Claim Status Update
   recoveryClaimStatusUpdate: (userName: string, claimNumber: string, status: string, message: string) => ({
-    subject: `Case Update: Case #${claimNumber} Status Shift - Solariem`,
+    subject: `Update on your case #${claimNumber} - Solariem`,
     html: getBaseTemplate(
-      'Forensic Case Intelligence Update',
+      'Update on your case',
       `
-      <p>An authorised update has been posted to your recovery case timeline.</p>
+      <p>Your case has moved on. Here is where it stands.</p>
       <table class="data-table">
         <tr><td>Claim Number:</td><td class="highlight">${claimNumber}</td></tr>
         <tr><td>New Status:</td><td>${status.toUpperCase().replace('_', ' ')}</td></tr>
@@ -507,9 +527,9 @@ export const emailTemplates = {
       <div style="background-color: #F5F4F0; padding: 25px; border-radius: 12px; border: 1px solid #E6E4DE; margin: 30px 0;">
         <p style="margin: 0; font-size: 15px; color: #14130F; line-height: 1.6;"><strong>Forensic Note:</strong> ${message}</p>
       </div>
-      <p>Please use the button below to view the full chronology of your repatriation process.</p>
+      <p>Use the button below to see the full history of your case.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/track-claim" class="button">Track Your Claim</a>
+        <a href="${APP_URL}/track-claim" class="button">Track Your Claim</a>
       </div>
       `,
       userName
@@ -534,7 +554,7 @@ export const emailTemplates = {
       </table>
       <p><strong>What happens next:</strong> To release funds we need an active Solariem account in your own name. If you do not have one, register using the button below. We will confirm receipt of the fee and the completed identity check before release, and we will tell you if either is outstanding.</p>
       <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/signup" class="button">Create Account / Login</a>
+        <a href="${APP_URL}/signup" class="button">Create Account / Login</a>
       </div>
       <p style="text-align: center; font-size: 12px; color: #6b7280; margin-top: 20px;">
         We will not ask you for a bank detail, a wallet address, or a payment by any other route in
@@ -543,7 +563,7 @@ export const emailTemplates = {
       `,
       userName
     ),
-    text: `Hello ${userName}, case #${claimNumber} finalized. ${sym}${recoveredAmount} recovered. Register at ${process.env.NEXT_PUBLIC_APP_URL}/signup to receive funds.`
+    text: `Hello ${userName}, case #${claimNumber} finalized. ${sym}${recoveredAmount} recovered. Register at ${APP_URL}/signup to receive funds.`
     };
   },
 
@@ -576,7 +596,7 @@ export const emailTemplates = {
             Current Status: ${status}
           </div>
         </div>
-        <p>This is an automated intelligence briefing regarding a shift in your account's operational status.</p>
+        <p>This is an automated message about a change to your account status.</p>
         <div style="background-color: #F5F4F0; padding: 25px; border-radius: 12px; border: 1px solid #E6E4DE; margin: 30px 0;">
           <p style="margin: 0; font-size: 14px; color: #4b5563; line-height: 1.6;"><strong>Reason for Adjustment:</strong><br>${reason}</p>
         </div>
@@ -587,9 +607,9 @@ export const emailTemplates = {
         </table>
         <p style="font-size: 13px; color: #6b7280; font-style: italic;">Note: This fee is a refundable security protocol and will be credited back to your balance upon account restoration.</p>
         ` : ''}
-        <p>To ${status === 'normal' ? 'resume' : 'initiate status resolution'} and access your assets, please log in to your dashboard.</p>
+        <p>${status === 'normal' ? 'Your account is active again.' : 'To lift the restriction, log in to your dashboard.'}</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+          <a href="${APP_URL}/dashboard" class="button">Go to Dashboard</a>
         </div>
         `,
         userName
@@ -617,7 +637,7 @@ export const emailTemplates = {
         `${codeType}`,
         `
         <p>Hello ${userName},</p>
-        <p>You requested a <strong>${codeType}</strong> to continue a withdrawal. Use the code below to verify the corresponding step in the dashboard.</p>
+        <p>You asked for a <strong>${codeType}</strong> code to continue your withdrawal. Enter it on the dashboard.</p>
         <div style="text-align: center; margin: 30px 0;">
           <div style="display: inline-block; padding: 18px 32px; border-radius: 12px; background-color: #14130F; color: #0E5A50; font-size: 28px; font-weight: 800; letter-spacing: 0.3em; font-family: 'Courier New', monospace;">
             ${code}
@@ -630,7 +650,7 @@ export const emailTemplates = {
         </table>
         <p style="font-size: 13px; color: #6b7280; font-style: italic;">This code expires in 10 minutes. If you did not request it, log in to your dashboard and review your recent activity.</p>
         <div class="button-container">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard?section=withdraw" class="button">Enter Code</a>
+          <a href="${APP_URL}/dashboard?section=withdraw" class="button">Enter Code</a>
         </div>
         `,
         userName

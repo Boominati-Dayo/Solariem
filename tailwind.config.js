@@ -74,14 +74,34 @@ module.exports = {
 					600: "#77736B", 700: "#5A574F", 800: "#3D3B36",
 					900: "#232220",
 				},
-				/* Retained for compatibility; unused in the new UI. */
+				/* ---- Solariem gold: the second brand voice ----
+				   This key used to hold a COPY OF THE VERDIGRIS RAMP under the
+				   name "gold", described as "retained for compatibility". It was
+				   a trap: every `gold-*` class silently rendered teal, and
+				   `bg-gold` meant `bg-primary`. Checked before repointing --
+				   zero Tailwind `gold-50..900` classes exist in src/. (The five
+				   textual matches for "gold" are a virtual-card LEVEL id in
+				   VirtualCardsSection, which paints from the primary ramp and
+				   never touched this scale.) Now it is actually gold.
+
+				   Contrast anchors, measured against bone #FAF9F6:
+				     700 #885011 = 6.23:1  AA   the lowest step safe for text
+				     500 #C3811D = 3.08:1  UI/borders only
+				     ink on 400 #DD9C2C = 7.85:1  AAA  button fill
+				   Never light text on any step of this ramp. */
 				gold: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))',
-					50: "#EDF2F0", 100: "#D3E0DC", 200: "#A9C3BC",
-					300: "#7BA69D", 400: "#3C8378", 500: "#0E5A50",
-					600: "#0A463E", 700: "#07332D", 800: "#04211D",
-					900: "#02120F",
+					DEFAULT: 'hsl(var(--gold))',
+					/* Ink, not white. bone-on-gold is 1.61:1 and fails. */
+					foreground: 'hsl(var(--foreground))',
+					text: 'hsl(var(--gold-text))',
+					bright: 'hsl(var(--gold-bright))',
+					mid: 'hsl(var(--gold-mid))',
+					tint: 'hsl(var(--gold-tint))',
+					hover: 'hsl(var(--gold-hover))',
+					50: "#F7EFDE", 100: "#F0E3C4", 200: "#E1C78D",
+					300: "#D2A857", 400: "#DD9C2C", 500: "#C3811D",
+					600: "#A96A12", 700: "#885011", 800: "#6B3F0E",
+					900: "#4A2A09",
 				},
 
 				card: {
@@ -116,7 +136,8 @@ module.exports = {
 					'2': 'hsl(var(--chart-2))',
 					'3': 'hsl(var(--chart-3))',
 					'4': 'hsl(var(--chart-4))',
-					'5': 'hsl(var(--chart-5))'
+					'5': 'hsl(var(--chart-5))',
+					'6': 'hsl(var(--chart-6))'
 				}
 			},
 

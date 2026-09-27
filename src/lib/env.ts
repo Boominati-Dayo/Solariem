@@ -18,20 +18,39 @@
  *      that value propagates into canonical tags, the sitemap, Open Graph URLs
  *      and JSON-LD ids. Getting it wrong is worse than not starting.
  *
- * One deliberate exception: `next build` runs with NODE_ENV=production while
- * statically rendering pages, and it does not have your deploy-time secrets in
- * scope on a developer machine. Building is therefore allowed to see the
- * localhost default. The failure surfaces when the built app actually serves a
- * request, which is the point at which a wrong canonical URL would do damage.
+ * Two deliberate exceptions, both about WHERE the check runs rather than
+ * whether it runs:
+ *
+ * 1. Server only. This module is imported by files that end up in the browser
+ *    bundle, and `process.env.NODE_ENV` is inlined as "production" there, so
+ *    an unguarded check would throw in the client and take the whole page down
+ *    with a blank error screen. A configuration mistake must surface as a
+ *    server-side error with a useful message, never as a broken UI. It is also
+ *    futile to check client-side: `NEXT_PUBLIC_*` values are inlined at build
+ *    time, so if the variable was missing from the build environment the
+ *    browser has no way to recover it.
+ *
+ * 2. `next build` is allowed to see the localhost default. It runs with
+ *    NODE_ENV=production but does not have your deploy-time values in scope on
+ *    a developer machine, and it statically renders pages that read SITE_URL.
+ *    Failing the build there would block the very act of fixing the value.
+ *    The failure surfaces when the built app serves a request, which is the
+ *    point at which a wrong canonical URL would do damage.
  */
 
 const PHASE_PRODUCTION_BUILD = 'phase-production-build';
 
 const isBuild = () => process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD;
 const isProd = () => process.env.NODE_ENV === 'production';
+const isServer = () => typeof window === 'undefined';
 
-/** True when we should enforce production rules. False during `next build`. */
-const enforce = () => isProd() && !isBuild();
+/**
+ * True when we should enforce production rules.
+ *
+ * Server only, and never during `next build`. See the note at the top of this
+ * file for why a browser-side throw is the wrong behaviour.
+ */
+const enforce = () => isProd() && isServer() && !isBuild();
 
 /**
  * Values that are technically set but functionally placeholders. Each is tied

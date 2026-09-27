@@ -14,7 +14,7 @@
  * Exit codes:  0 = clear to launch   1 = one or more blockers
  */
 import './load-env.mjs';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { MongoClient } from 'mongodb';
 
 const results = [];
@@ -178,6 +178,35 @@ try {
   await client.close();
 } catch (e) {
   add('BLOCKER', 'database', 'cannot connect: ' + e.message.split('\n')[0], 'Check MONGODB_URI.');
+}
+
+// ---------------------------------------------------------------------------
+// 7. Brand assets
+// ---------------------------------------------------------------------------
+// The logo is a one-file swap, so nothing breaks if it is missing -- the email
+// template falls back to a text wordmark. But a banking site going out with a
+// default Next.js triangle in the tab and a bare text name in every email is not
+// a finished product, and neither failure announces itself. Hence the check.
+const logoPath = siteSrc.match(/logoPath:\s*'([^']*)'/)?.[1];
+if (logoPath) {
+  const logoAbs = new URL('../public' + logoPath, import.meta.url);
+  if (!existsSync(logoAbs)) {
+    add('BLOCKER', 'brand',
+      `logo ${logoPath} is missing, so every transactional email goes out with a bare text wordmark`,
+      `Drop the PNG at public${logoPath}. See public/brand/README.md for the size and format the email clients need. No code change is needed once the file is there.`);
+  }
+  // Icons are already wired in layout.tsx (favicon.ico, favicon.svg,
+  // apple-touch-icon, web-app-manifest) and all present, so this only fires if
+  // one is deleted. Kept as a warning because the site still works without it.
+  const layoutSrc = readFileSync(new URL('../src/app/layout.tsx', import.meta.url), 'utf8');
+  for (const iconPath of [...layoutSrc.matchAll(/url: '(\/[^']+)'|'(?=\/favicon\/)[^']*'/g)]
+    .map((m) => m[1])
+    .filter(Boolean)) {
+    if (!existsSync(new URL('../public' + iconPath, import.meta.url))) {
+      add('WARN', 'brand', `icon ${iconPath} is referenced in layout.tsx but not in public/`,
+        'Browsers will fall back to a default icon or a broken request.');
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

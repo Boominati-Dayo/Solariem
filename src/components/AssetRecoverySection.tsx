@@ -54,7 +54,7 @@ const ROUTES: Route[] = [
 
 export default function AssetRecoverySection() {
   return (
-    <section className="section section-rule">
+    <section className="section section-rule grid-hairline">
       <div className="mx-auto max-w-container px-5 sm:px-8">
         <header className="section-head">
           <h2 className="text-h2 text-foreground">What can be recovered, and how.</h2>

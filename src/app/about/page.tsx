@@ -7,13 +7,13 @@ import MarcusChenImg from '@/assets/images_for_pages/leaders/Marcus Chen.jpg';
 import { ORG } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'About',
-  description: `What ${ORG.name} is, who runs it, and what we will not do. We are a financial services company, not a bank, and we pay ourselves only after money comes back.`,
+  title: 'Who runs Solariem, and what we refuse to do',
+  description: 'The three people who run Solariem, what happens to your balance while we hold it, and the claims we will not make. We pay ourselves only after money comes back.',
   alternates: { canonical: '/about' },
   openGraph: {
-    title: `About ${ORG.name}`,
+    title: 'Who runs Solariem, and what we refuse to do',
     description:
-      'What we are, who runs it, and what we will not do. Not a bank, no success fee without recovery, no guarantees.',
+      'The three people who run Solariem, and the claims we will not make. We pay ourselves only after money comes back.',
     url: '/about',
   },
 };
@@ -61,7 +61,7 @@ const PRINCIPLES = [
   },
   {
     title: 'No regulator in our pocket',
-    body: 'We have no special access to any regulator, police force, or government body, and we will never imply that we do. Our leverage is the transaction record and, where it comes to it, a court. Anyone claiming insider access is describing something that does not exist.',
+    body: 'We have no special access to any regulator, police force, or government body, and we will never imply that we do. What we rely on is the transaction record and, where it comes to it, a court. Anyone claiming insider access is describing something that does not exist.',
   },
 ];
 
@@ -82,10 +82,10 @@ export default function AboutPage() {
                 and we do them properly rather than ten things badly.
               </p>
               <p className="mt-5 max-w-measure text-body text-muted-foreground">
-                We are not a bank, we do not take deposits, and there is no deposit guarantee behind
-                your balance. We do not guarantee that money comes back either, and any firm that
-                tells you it can is misleading you. What we do is tell you early and in writing what
-                the realistic outcome is.
+                We hold your balance, and there is no deposit guarantee behind it. We do not
+                guarantee that money comes back either, and any firm that tells you it can is
+                misleading you. What we do is tell you early and in writing what the realistic
+                outcome is.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-3">
                 <Link href="/contact" className="btn-ink">

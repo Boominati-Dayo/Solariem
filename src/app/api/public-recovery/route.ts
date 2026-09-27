@@ -101,6 +101,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, data: { claimNumber } });
     } catch (error) {
         console.error('Public recovery submission error:', error);
-        return NextResponse.json({ success: false, error: 'Intelligence transmission failed' }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'We could not send your report. Please try again.' }, { status: 500 });
     }
 }

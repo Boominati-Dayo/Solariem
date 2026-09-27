@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { SITE_URL } from '@/lib/site';
+import { SITE_URL } from '@/lib/env';
 
 /**
  * Sitemap.
@@ -11,9 +11,10 @@ import { SITE_URL } from '@/lib/site';
  * every session-gated or transactional route is excluded by default, and
  * adding a page here is a deliberate act.
  *
- * NOTE: SITE_URL defaults to http://localhost:3000 until NEXT_PUBLIC_SITE_URL
- * is set. Do not deploy this without it — it would advertise a localhost URL to
- * every search engine that reads the sitemap.
+ * NOTE: SITE_URL no longer defaults. `requireEnv` in ./env throws when
+ * NEXT_PUBLIC_SITE_URL is unset or still a placeholder, so a deploy missing it
+ * fails loudly instead of advertising a localhost URL to every search engine
+ * that reads this file. The only exception is `next build`; see ./env.
  */
 type Entry = {
   path: string;

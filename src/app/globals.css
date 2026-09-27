@@ -30,6 +30,38 @@
     --accent-subtle: 154 16.3% 91.6%;
     --accent-hover: 172 75% 15.7%;
 
+    /* --------------------------------------------------------------------
+       SOLARIEM GOLD. The second voice.
+
+       Bone + ink + one deep teal read as "plain" because the teal has to do
+       two jobs at once: trust and energy. Gold takes the energy, which frees
+       the verdigris to mean trust and nothing else. It also matches the name
+       -- Solariem is the sun.
+
+       Every ratio below is computed rather than eyeballed (WCAG 2.1 relative
+       luminance, against #FAF9F6 bone and #14130F ink):
+           --gold-text   #885011 on bone  = 6.23:1  AA   body text OK
+           --gold-text   #885011 on card  = 6.56:1  AA
+           --gold-bright #F4BF4E on ink   = 10.98:1 AAA
+           ink on --gold #DD9C2C         = 7.85:1  AAA  button fill
+           ink on --gold-mid #C3811D     = 5.73:1  AA
+           --gold-mid   #C3811D on bone  = 3.08:1  UI/borders ONLY, never text
+           bone on --gold-bright         = 1.61:1  FAIL  never put light text
+                                                            on gold. Use ink.
+
+       The names are semantic so a theme switch never needs re-reasoning:
+         --gold         the fill
+         --gold-text    gold you may read on the current background
+         --gold-bright  decoration and highlight on dark
+         --gold-tint    background wash
+       -------------------------------------------------------------------- */
+    --gold: 38 72% 52%;
+    --gold-text: 32 78% 30%;
+    --gold-bright: 41 88% 63%;
+    --gold-mid: 36 74% 44%;
+    --gold-tint: 40 60% 92%;
+    --gold-hover: 36 78% 46%;
+
     --destructive: 6 60.6% 39.8%;
     --destructive-foreground: 0 0% 100%;
     --positive: 152 39% 30.2%;
@@ -48,6 +80,7 @@
     --chart-3: 6 60.6% 39.8%;
     --chart-4: 40 3.7% 52.4%;
     --chart-5: 152 39% 30.2%;
+    --chart-6: 38 72% 52%;   /* gold, so a 6th series is distinguishable */
   }
 
   .dark {
@@ -68,6 +101,16 @@
     --accent-foreground: 40 10.3% 5.7%;
     --accent-subtle: 157 31% 11.4%;
     --accent-hover: 170 31.3% 60.6%;
+    /* On ink, gold-bright is already readable at 10.98:1, so --gold-text and
+       --gold-bright collapse to the same value here by design. See the light
+       block above for the full table and the one hard rule: never light text
+       on gold. */
+    --gold: 41 88% 63%;
+    --gold-text: 41 88% 63%;
+    --gold-bright: 45 90% 70%;
+    --gold-mid: 38 60% 38%;
+    --gold-tint: 38 40% 14%;
+    --gold-hover: 45 90% 70%;
     --destructive: 11 63.1% 67.1%;
     --destructive-foreground: 40 10.3% 5.7%;
     --positive: 150 34% 57.8%;
@@ -81,6 +124,7 @@
     --chart-3: 11 63.1% 67.1%;
     --chart-4: 38 5.4% 39.8%;
     --chart-5: 150 34% 57.8%;
+    --chart-6: 41 88% 63%;
   }
 
   html {
@@ -172,6 +216,134 @@
   }
 
   /* Standard card — hairline, no shadow, no hover lift. */
+  /* Solariem gold. Ink label on the fill, never the reverse: bone on gold is
+     1.61:1 and fails outright. Deliberately not a shadow or a glow. */
+  .btn-gold {
+    @apply inline-flex h-12 items-center justify-center border border-gold bg-gold
+      px-6 text-body-sm font-medium tracking-[-0.01em] text-foreground
+      transition-colors duration-150 ease-out
+      hover:border-gold-hover hover:bg-gold-hover
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground
+      disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  /* -------------------------------------------------------------------------
+     ATMOSPHERE.
+
+     The site was reading as "plain" because every surface was a flat fill. The
+     house style is still hairlines and no shadows, so depth comes from washes
+     rather than elevation. All three are pure CSS: no image request, no layout
+     shift, nothing on a cold cache.
+
+     Kept deliberately low-contrast. These sit BEHIND text, so if one ever
+     competes with body copy the fix is to lighten it, not to add a scrim.
+     ---------------------------------------------------------------------- */
+
+  /* Two large soft radial washes in the two brand colours, offset so they meet
+     nowhere. Reads as light falling across the section. */
+  .wash-brand {
+    background-image:
+      radial-gradient(60rem 34rem at 12% -8%, hsl(var(--gold) / 0.16), transparent 62%),
+      radial-gradient(52rem 30rem at 96% 8%, hsl(var(--accent) / 0.14), transparent 60%);
+  }
+
+  /* The same idea for dark sections. Gold carries further on ink, so it gets
+     more weight here. */
+  .wash-brand-dark {
+    background-image:
+      radial-gradient(58rem 32rem at 8% 0%, hsl(var(--gold-bright) / 0.18), transparent 60%),
+      radial-gradient(54rem 32rem at 98% 12%, hsl(var(--accent) / 0.22), transparent 62%);
+  }
+
+  /* Hairline grid. 1px at ~4.5% ink. Reads as a ledger, not as graph paper,
+     because the lines are barely there on purpose. */
+  .grid-hairline {
+    background-image:
+      linear-gradient(to right, hsl(var(--foreground) / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground) / 0.045) 1px, transparent 1px);
+    background-size: 88px 88px;
+  }
+  .dark .grid-hairline {
+    background-image:
+      linear-gradient(to right, hsl(var(--foreground) / 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground) / 0.055) 1px, transparent 1px);
+  }
+
+  /* Flat gold wash, for a single emphasised band. */
+  .wash-gold { background-color: hsl(var(--gold-tint)); }
+
+  /* --- photographic backdrop ---------------------------------------------
+     Drives <PhotoBackdrop>. The image fills the section, then two scrims go
+     over it: a directional one so the copy always lands on the solid end
+     whatever the photo contains, and a brand tint so the section still reads
+     as ours and the image reads as texture rather than a stock picture in a
+     box. This is the fix for "a separate image by the side" -- it lets a real
+     photograph carry a whole section instead of sitting in a frame beside the
+     words. ------------------------------------------------------------------- */
+  .photo-scrim {
+    background: linear-gradient(
+      to top,
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.94) 34%,
+      hsl(var(--background) / 0.55) 66%,
+      hsl(var(--background) / 0.3) 100%
+    );
+  }
+  .dark .photo-scrim {
+    background: linear-gradient(
+      to top,
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.93) 36%,
+      hsl(var(--background) / 0.6) 68%,
+      hsl(var(--background) / 0.35) 100%
+    );
+  }
+  /* Horizontal variant, for a section whose copy runs down the left edge --
+     a hero, or a two-column band with a photo behind it. The vertical scrim
+     above protects copy that sits in the lower half; this one protects copy
+     that occupies the full height of the left side, which is the shape of
+     most hero copy. On a narrow viewport the layout stacks, so the fallback
+     in the media query puts the protection back under the text instead of
+     leaving the copy stranded over the busiest part of the photo. */
+  .photo-scrim-left {
+    background: linear-gradient(
+      to right,
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.95) 38%,
+      hsl(var(--background) / 0.72) 58%,
+      hsl(var(--background) / 0.45) 100%
+    );
+  }
+  .dark .photo-scrim-left {
+    background: linear-gradient(
+      to right,
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.94) 40%,
+      hsl(var(--background) / 0.74) 60%,
+      hsl(var(--background) / 0.48) 100%
+    );
+  }
+  @media (max-width: 1023px) {
+    .photo-scrim-left {
+      background: linear-gradient(
+        to top,
+        hsl(var(--background)) 0%,
+        hsl(var(--background) / 0.94) 46%,
+        hsl(var(--background) / 0.55) 78%,
+        hsl(var(--background) / 0.3) 100%
+      );
+    }
+  }
+
+  .photo-tint {
+    background-color: hsl(var(--accent) / 0.14);
+    mix-blend-mode: multiply;
+  }
+  .dark .photo-tint {
+    background-color: hsl(var(--accent) / 0.2);
+    mix-blend-mode: screen;
+  }
+
   .card-line {
     @apply border border-border bg-card p-6 lg:p-8;
   }

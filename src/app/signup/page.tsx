@@ -195,7 +195,7 @@ const SignupForm = () => {
           >
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h2>
-              <p className="text-gray-600">Join Solariem and start your journey today</p>
+              <p className="text-gray-600">Create your Solariem account</p>
 
               {/* Step Indicator */}
               <div className="flex items-center justify-center mt-6 mb-4">

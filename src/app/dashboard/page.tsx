@@ -110,7 +110,7 @@ const AccountHub = ({ onNavigate }: { onNavigate: (id: string) => void }) => {
 
   const items = [
     { id: 'profile', name: 'Identity Management', icon: <User className="w-5 h-5" />, desc: 'Core ledger & credentials', color: 'text-navy-50 bg-navy-900 border-navy-800' },
-    { id: 'support', name: 'Authorized Support', icon: <HeadphonesIcon className="w-5 h-5" />, desc: 'Direct intelligence line', color: 'text-navy-900 bg-navy-50 border-gray-100' },
+    { id: 'support', name: 'Authorized Support', icon: <HeadphonesIcon className="w-5 h-5" />, desc: 'Talk to us directly', color: 'text-navy-900 bg-navy-50 border-gray-100' },
     ...(isAdmin ? [{
       id: 'admin',
       name: 'Network Administration',

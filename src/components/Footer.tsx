@@ -17,8 +17,8 @@ export default function Footer() {
               A multi-currency account, and a team that traces money taken by fraud.
             </p>
             <p className="mt-6 max-w-measure text-caption text-background/50">
-              {ORG.legalName} is a financial services company. It is not a bank and does not take
-              deposits.
+              {ORG.legalName} holds money for customers. Balances are not covered by any deposit
+              guarantee scheme.
             </p>
           </div>
 

@@ -201,7 +201,7 @@ const CaseReportPage = () => {
                             transition={{ delay: 0.2 }}
                             className="text-gray-400 font-medium max-w-xl mx-auto"
                         >
-                            Provide comprehensive details regarding your financial loss. Our intelligence team will evaluate your case for potential asset repatriation.
+                            Tell us what happened and roughly how much you lost. We will read it and tell you whether the money can be traced.
                         </motion.p>
                     </div>
 
@@ -318,7 +318,7 @@ const CaseReportPage = () => {
                                             <ShieldAlert className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-black text-navy-900 uppercase tracking-tight">Incident Intelligence</h3>
+                                            <h3 className="text-xl font-black text-navy-900 uppercase tracking-tight">What happened</h3>
                                             <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Details of the scam event.</p>
                                         </div>
                                     </div>
@@ -404,7 +404,7 @@ const CaseReportPage = () => {
                                             <ShieldAlert className="w-5 h-5" />
                                         </div>
                                         <p className="text-xs text-amber-900/60 font-medium leading-relaxed">
-                                            <strong>Affidavit of Truth:</strong> By submitting this report, you certify that all provided information is accurate to the best of your knowledge. Providing false information to forensic intelligence is prohibited.
+                                            <strong>Affidavit of Truth:</strong> By submitting this report, you certify that all provided information is accurate to the best of your knowledge. Giving us information you know to be false is prohibited.
                                         </p>
                                     </div>
 
@@ -430,7 +430,7 @@ const CaseReportPage = () => {
                                                 {uploading ? (
                                                     <div className="flex flex-col items-center gap-2">
                                                         <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-                                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Uploading Intelligence...</span>
+                                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Uploading files...</span>
                                                     </div>
                                                 ) : formData.screenshotUrl ? (
                                                     <div className="flex flex-col items-center gap-2">
@@ -487,7 +487,7 @@ const CaseReportPage = () => {
                                     {loading ? (
                                         <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
                                     ) : <Zap className="w-4 h-4" />}
-                                    Transmit Intelligence
+                                    Send report
                                 </button>
                             )}
                         </div>

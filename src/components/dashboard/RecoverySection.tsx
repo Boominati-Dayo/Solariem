@@ -98,7 +98,7 @@ const RecoverySection = () => {
 
   const getStatusSteps = (status: string) => {
     const steps = [
-      { title: 'Intelligence Audit', icon: <FileSearch />, status: 'pending', desc: 'Case initialized and awaiting officer assignment.' },
+      { title: 'Case review', icon: <FileSearch />, status: 'pending', desc: 'Case opened. Waiting for someone to pick it up.' },
       { title: 'Forensic Trace', icon: <Search />, status: 'pending', desc: 'Analyzing blockchain ledgers and international Swift records.' },
       { title: 'Legal Demand', icon: <Scale />, status: 'pending', desc: 'Issuing formal demands to receiving institutions and PSPs.' },
       { title: 'Bank Freeze', icon: <Building2 />, status: 'pending', desc: 'Securing temporary freezing orders on illicit accounts.' },
@@ -112,7 +112,7 @@ const RecoverySection = () => {
     if (currentIndex === -1) return steps;
 
     // Mapping Status to Step Index
-    // 0: Intelligence Audit (pending, investigating)
+    // 0: Case review (pending, investigating)
     // 1: Forensic Trace (forensic_phase)
     // 2: Legal Demand (legal_action)
     // 3: Bank Freeze (funds_frozen)
@@ -190,9 +190,9 @@ const RecoverySection = () => {
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
-            <p className="text-[10px] font-black text-primary-600 uppercase tracking-[0.2em]">Forensic Intelligence Division</p>
+            <p className="text-[10px] font-black text-primary-600 uppercase tracking-[0.2em]">Recovery team</p>
           </div>
-          <h2 className="text-xl mobile:text-3xl font-black text-navy-900 uppercase tracking-tighter mb-1">Recovery Intelligence OPS</h2>
+          <h2 className="text-xl mobile:text-3xl font-black text-navy-900 uppercase tracking-tighter mb-1">Your recovery case</h2>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Asset Tracking & Repatriation</p>
         </div>
 
@@ -349,7 +349,7 @@ const RecoverySection = () => {
                   </div>
                   <h3 className="text-3xl font-black text-navy-900 uppercase tracking-tighter mb-4">Briefing Transmitted</h3>
                   <p className="text-gray-500 max-w-md mx-auto mb-8 font-medium">
-                    Our forensic division has received your intelligence packet. A lead investigator will be assigned to your case shortly.
+                    We have your report. Someone from the team will be assigned to your case shortly.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
@@ -450,7 +450,7 @@ const RecoverySection = () => {
                     <div className="p-6 bg-navy-50 rounded-2xl border border-navy-100 flex items-start gap-4">
                       <Lock className="text-navy-900 w-5 h-5 shrink-0 mt-1" />
                       <p className="text-[10px] text-navy-900/70 font-bold leading-relaxed uppercase tracking-widest">
-                        Your submission is encrypted with intelligence-grade protocols. We bypass slow local channels to hit scammers directly at the financial hubs.
+                        Your report is encrypted. We go straight to the banks and institutions holding the money rather than waiting on local channels, which is what usually makes the difference.
                       </p>
                     </div>
 
@@ -496,7 +496,7 @@ const RecoverySection = () => {
                 </div>
                 <p className="text-gray-500 font-medium text-sm leading-relaxed mb-6">
                   {scam.id === 'crypto' && 'Tracing stolen BTC and stablecoins through mixers to final off-ramp exchanges.'}
-                  {scam.id === 'forex' && 'Targeting Payment Service Providers (PSPs) and banks that facilitated illegal broker trades.'}
+                  {scam.id === 'forex' && 'Going after the banks and payment companies that moved the money for the illegal broker.'}
                   {scam.id === 'romance' && 'Discrete handling of emotional manipulation cases involving overseas syndicate wire transfers.'}
                   {scam.id === 'phishing' && 'Holding institutions accountable for regulatory and security failures leading to hacks.'}
                 </p>

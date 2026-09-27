@@ -492,7 +492,7 @@ const TrackingView = ({ onBack }: { onBack: () => void }) => {
                   <div className="mobile:hidden space-y-4">
                     {[
                       { label: 'Payload Submitted', active: true, done: true, desc: 'Application data encrypted and sent to ledger.' },
-                      { label: 'Intelligence Review', active: loan.status !== 'pending', done: loan.status !== 'pending' && loan.status !== 'processing', desc: 'Authorised audit of credentials and sum.' },
+                      { label: 'Checking your details', active: loan.status !== 'pending', done: loan.status !== 'pending' && loan.status !== 'processing', desc: 'Authorised audit of credentials and sum.' },
                       { label: 'Protocol Finalization', active: loan.status === 'approved' || loan.status === 'rejected', done: loan.status === 'approved' || loan.status === 'rejected', desc: 'Authorised release or rejection entry.' }
                     ].map((step, i) => (
                       <div key={i} className="flex gap-4">
