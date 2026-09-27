@@ -37,7 +37,19 @@ export { SITE_URL } from './env';
 
 export const ORG = {
   name: 'Solariem',
-  legalName: 'Solariem',
+  /**
+   * Registered entity name. Appears in the terms, privacy notice, disclaimer,
+   * footer copyright line and the JSON-LD Organization node.
+   *
+   * NOTE ON THE WORD "BANK": this is the registered name, and the legal pages
+   * state repeatedly that the business is not a bank and takes no deposits.
+   * Those two facts are compatible — a company may be named "Trust Bank"
+   * without being authorised as one — but stated side by side without comment
+   * they read as a contradiction to anyone checking. The terms and disclaimer
+   * therefore acknowledge the name explicitly rather than hoping it is not
+   * noticed. Do not "simplify" that sentence away.
+   */
+  legalName: 'Solariem Trust Bank',
   tagline: 'Every asset, accounted for.',
   description:
     'Solariem provides multi-currency accounts and traces fraudulent transfers through the institutions involved. No success fee is charged unless money is actually returned to you.',

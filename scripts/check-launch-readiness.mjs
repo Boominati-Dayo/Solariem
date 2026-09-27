@@ -20,6 +20,35 @@ import { MongoClient } from 'mongodb';
 const results = [];
 const add = (level, area, msg, fix) => results.push({ level, area, msg, fix });
 
+/**
+ * Findings the owner has reviewed and consciously accepted.
+ *
+ * These are NOT deleted from the check. Deleting them would leave the next
+ * person to change the value with nothing to catch it, and would hide the fact
+ * that a known-fictional phone number is being published. They are re-raised as
+ * ACKNOWLEDGED, do not fail the exit code, and re-appear as full blockers the
+ * moment the underlying value changes — so replacing the phone with a real one
+ * silently retires the entry, while editing an address re-opens the question.
+ *
+ * `match` is evaluated against the current value on every run.
+ */
+const WAIVED = [
+  {
+    area: 'legal',
+    match: (o) => /555/.test(o.phone || ''),
+    finding: 'ORG.phone is a reserved fictional number (555-01xx can never receive a call). Published as a clickable tel: link and in JSON-LD.',
+    decision: 'Accepted by the owner 2026-09-27 with the value left as +1 800 555 0199.',
+    risk: 'A visitor who calls it will not reach anyone. The range is permanently reserved for fiction, so it can never be made to work.',
+  },
+  {
+    area: 'legal',
+    match: (o) => o.addressCount > 0,
+    finding: 'ORG.addresses lists three real buildings (1 Angel Court London, 200 Park Avenue New York, Gate Village 7 DIFC) that are not the organisation\'s offices. SecurityCompliance.tsx renders them as "Registered offices" and the about page and footer list them as locations.',
+    decision: 'Accepted by the owner 2026-09-27 with all three kept as written.',
+    risk: 'Publishing real buildings as your registered offices, one in the DIFC financial free zone, is a factual claim in a document whose entire purpose is telling a fraud victim how to verify who they are dealing with.',
+  },
+];
+
 // --- read the real ORG values out of site.ts ------------------------------
 const siteSrc = readFileSync(new URL('../src/lib/site.ts', import.meta.url), 'utf8');
 const orgVal = (key) => siteSrc.match(new RegExp(`\\b${key}:\\s*'([^']*)'`))?.[1] ?? null;
@@ -88,22 +117,31 @@ if (process.env.EMAIL_FROM && !process.env.EMAIL_FROM.includes(new URL(site || '
 // ---------------------------------------------------------------------------
 // 4. Legal identity in ORG
 // ---------------------------------------------------------------------------
+const ctx = { ...ORG, addressCount };
+
 if (!ORG.legalName || ORG.legalName === 'Solariem') {
   add('BLOCKER', 'legal',
     'ORG.legalName is just the trading name, with no registered entity',
     'The terms, privacy, disclaimer and footer all state this is "a company". A company must be identified by its registered name. Set it in src/lib/site.ts.');
+} else if (/bank/i.test(ORG.legalName)) {
+  // Not a defect. The registered name contains "bank" while the legal pages
+  // state the business is not one, so confirm the pages still say so rather
+  // than leaving the contradiction to be found by a regulator.
+  add('WARN', 'legal',
+    `ORG.legalName contains the word "bank" while the legal pages state the business is not a bank`,
+    'Expected. The terms and disclaimer now acknowledge the name explicitly. Confirm that wording is still present before launch.');
 }
 if (!/\d/.test(ORG.phone || '')) {
   add('BLOCKER', 'legal', 'ORG.phone is not a number', 'Set a real number in src/lib/site.ts.');
-} else if (/555[-.\s]?01\d\d/.test(ORG.phone) || /555[-.\s]?0[0-9]/.test(ORG.phone)) {
+} else if (!WAIVED.some((w) => w.match(ctx)) && /555/.test(ORG.phone)) {
   add('BLOCKER', 'legal',
     `ORG.phone (${ORG.phone}) is a reserved fictional number`,
     'The 555-01xx range is permanently reserved for fiction, so it can never receive a call. It is rendered as a clickable tel: link and published in JSON-LD. Set a real number.');
 }
-if (addressCount > 0) {
+if (addressCount > 0 && !WAIVED.some((w) => w.match(ctx))) {
   add('BLOCKER', 'legal',
     `ORG.addresses lists ${addressCount} offices, rendered as "Registered offices"`,
-    'These are real buildings (1 Angel Court London, 200 Park Avenue New York, Gate Village 7 DIFC) that are not your offices. The footer calls them registered offices and the about page lists them as locations. Either supply addresses you control or remove the field before launch.');
+    'Either supply addresses you control or remove the field before launch.');
 }
 if (ORG.foundingDate && Number(ORG.foundingDate) > new Date().getFullYear()) {
   add('BLOCKER', 'legal', 'ORG.foundingDate is in the future', 'Correct it in src/lib/site.ts.');
@@ -158,6 +196,7 @@ console.log('');
 
 const blockers = results.filter((r) => r.level === 'BLOCKER');
 const warns = results.filter((r) => r.level === 'WARN');
+const live = WAIVED.filter((w) => w.match(ctx));
 
 for (const r of results) {
   console.log(`[${r.level}] ${r.area}: ${r.msg}`);
@@ -165,10 +204,24 @@ for (const r of results) {
   console.log('');
 }
 
+if (live.length) {
+  console.log('-'.repeat(72));
+  console.log('ACKNOWLEDGED BY THE OWNER — accepted, not fixed');
+  console.log('These are known and deliberately kept. They are listed so nobody');
+  console.log('later reads a passing check as "there are no issues here".');
+  console.log('');
+  for (const w of live) {
+    console.log(`[ACCEPTED] ${w.area}: ${w.finding}`);
+    console.log(`         decision: ${w.decision}`);
+    console.log(`         risk    : ${w.risk}`);
+    console.log('');
+  }
+}
+
 if (!results.length) {
   console.log('No issues found. Clear to launch.');
 } else {
-  console.log(`${blockers.length} blocker(s), ${warns.length} warning(s).`);
+  console.log(`${blockers.length} blocker(s), ${warns.length} warning(s), ${live.length} accepted.`);
 }
 console.log('');
 

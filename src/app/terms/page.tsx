@@ -32,7 +32,7 @@ const CLAUSES = [
     n: 1,
     title: 'Who we are',
     body: [
-      `${ORG.legalName} provides multi-currency accounts and asset recovery services. We are a company, not a bank, and we are not authorised to take deposits. Money you hold with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme, and it does not carry the protection a bank current account does. Treat it accordingly.`,
+      `${ORG.legalName} provides multi-currency accounts and asset recovery services. Our name contains the word "bank", and we want to be direct about that, because it is the first thing to check and the easiest thing to be misled by. We are a company, not a bank. We are not authorised to take deposits, we are not regulated by the Financial Conduct Authority or any other prudential regulator, and no regulator, police force, court or government body stands behind us. Money you hold with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme, and it does not carry the protection a bank current account does. Treat it accordingly.`,
       'We are not affiliated with, and do not act on behalf of, any regulator, police force, court, bank, or government body. If anyone tells you we are, they are mistaken.',
     ],
   },

@@ -44,7 +44,7 @@ const CLAUSES = [
     n: 4,
     title: 'We are not a bank or a regulated firm',
     body: [
-      `${ORG.legalName} is a company that provides multi-currency accounts and asset recovery services. It is not a bank, it is not authorised to take deposits, and it is not a firm authorised to give investment advice.`,
+      `${ORG.legalName} is a company that provides multi-currency accounts and asset recovery services. Its name contains the word "bank". It is not one. It is not authorised to take deposits, it is not regulated by the Financial Conduct Authority or any other prudential regulator, and it is not a firm authorised to give investment advice.`,
       'Money held with us is not covered by the FSCS, the FDIC, or any other deposit guarantee scheme. We are not affiliated with, and do not act for, any regulator, police force, court, bank, or government body. If you are told we are, that person is wrong.',
     ],
   },
