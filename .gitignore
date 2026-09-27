@@ -1,0 +1,53 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# Runtime user uploads. Files here are user-submitted evidence and payment
+# images — financial data belonging to a real person. Nothing in the codebase
+# writes to this path any more (uploads go to Cloudinary under solariem/evidence),
+# but the directory must stay ignored so that if a local disk fallback is ever
+# reintroduced, a payment image can never reach version control.
+/public/uploads/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files — never commit real values.
+#
+# The blanket `.env*` also swallows .env.example, which is the one env file that
+# is supposed to be committed: without the negation below, a fresh clone has no
+# documented list of what the app needs and no idea which values are required.
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

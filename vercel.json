@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "NODE_ENV": "production",
+    "NODE_OPTIONS": "--max-old-space-size=4096"
+  },
+  "crons": [
+    {
+      "path": "/api/investments/process-daily-gains",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
+
+
+
+

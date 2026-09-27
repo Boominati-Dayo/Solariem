@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   SOLARIEM — design tokens
+   Light "Bone" / dark "Ink". All values are WCAG-verified:
+     body text >= 4.5:1, input boundaries >= 3:1 (WCAG 1.4.11),
+     primary action 17.65:1 (AAA).
+   ========================================================================== */
+@layer base {
+  :root {
+    --background: 45 28.6% 97.3%;   /* #FAF9F6 bone paper — never pure white */
+    --foreground: 48 14.3% 6.9%;    /* #14130F warm near-black ink */
+    --card: 0 0% 100%;
+    --card-foreground: 48 14.3% 6.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 48 14.3% 6.9%;
+
+    --primary: 48 14.3% 6.9%;       /* ink — the button */
+    --primary-foreground: 45 28.6% 97.3%;
+    --secondary: 40 4.4% 40.2%;
+    --secondary-foreground: 45 28.6% 97.3%;
+    --muted: 45 23.5% 93.3%;
+    --muted-foreground: 40 4.4% 40.2%;   /* 5.27:1 on background */
+    --subtle-foreground: 42 5.8% 43.7%;
+
+    --accent: 172 73.1% 20.4%;     /* #0E5A50 verdigris — 7.68:1 AAA */
+    --accent-foreground: 0 0% 100%;
+    --accent-subtle: 154 16.3% 91.6%;
+    --accent-hover: 172 75% 15.7%;
+
+    --destructive: 6 60.6% 39.8%;
+    --destructive-foreground: 0 0% 100%;
+    --positive: 152 39% 30.2%;
+
+    --border: 47 13.8% 87.3%;
+    --border-input: 40 3.7% 52.4%;  /* 3.40:1 — input boundary */
+    --input: 40 3.7% 52.4%;
+    --ring: 48 14.3% 6.9%;
+    --surface-3: 44 21.6% 90%;
+
+    --radius: 0px;
+    --measure: 42.5rem;
+
+    --chart-1: 172 73.1% 20.4%;
+    --chart-2: 40 4.4% 40.2%;
+    --chart-3: 6 60.6% 39.8%;
+    --chart-4: 40 3.7% 52.4%;
+    --chart-5: 152 39% 30.2%;
+  }
+
+  .dark {
+    --background: 40 10.3% 5.7%;
+    --foreground: 45 23.5% 93.3%;
+    --card: 40 6.1% 9.6%;
+    --card-foreground: 45 23.5% 93.3%;
+    --popover: 40 6.1% 9.6%;
+    --popover-foreground: 45 23.5% 93.3%;
+    --primary: 45 23.5% 93.3%;
+    --primary-foreground: 40 10.3% 5.7%;
+    --secondary: 40 5.6% 58%;
+    --secondary-foreground: 40 10.3% 5.7%;
+    --muted: 20 4.5% 13.1%;
+    --muted-foreground: 40 5.6% 58%;
+    --subtle-foreground: 40 3.7% 52.4%;
+    --accent: 169 28.9% 49.6%;
+    --accent-foreground: 40 10.3% 5.7%;
+    --accent-subtle: 157 31% 11.4%;
+    --accent-hover: 170 31.3% 60.6%;
+    --destructive: 11 63.1% 67.1%;
+    --destructive-foreground: 40 10.3% 5.7%;
+    --positive: 150 34% 57.8%;
+    --border: 36 6.3% 15.5%;
+    --border-input: 38 5.4% 39.8%;
+    --input: 38 5.4% 39.8%;
+    --ring: 45 23.5% 93.3%;
+    --surface-3: 40 3.5% 16.7%;
+    --chart-1: 169 28.9% 49.6%;
+    --chart-2: 40 5.6% 58%;
+    --chart-3: 11 63.1% 67.1%;
+    --chart-4: 38 5.4% 39.8%;
+    --chart-5: 150 34% 57.8%;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-geist), system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Balanced headlines, pretty body copy. */
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+
+  ::selection {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+
+  #__next { min-height: 100vh; }
+
+  * { @apply border-border; }
+
+  body { @apply bg-background text-foreground; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   Component primitives
+   Ink is the button. Hairlines, not shadows. transition-colors only.
+   ========================================================================== */
+@layer components {
+  .font-display {
+    font-family: var(--font-instrument-serif), Georgia, serif;
+    font-weight: 400;
+  }
+
+  /* Primary action: near-black fill, paper label. */
+  .btn-ink {
+    @apply inline-flex h-12 items-center justify-center border border-foreground bg-foreground
+      px-6 text-body-sm font-medium tracking-[-0.01em] text-background
+      transition-colors duration-150 ease-out
+      hover:bg-foreground/85
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground
+      disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  /* Secondary action: hairline outline that inverts on hover. */
+  .btn-line {
+    @apply inline-flex h-12 items-center justify-center border border-foreground bg-transparent
+      px-6 text-body-sm font-medium tracking-[-0.01em] text-foreground
+      transition-colors duration-150
+      hover:bg-foreground hover:text-background
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground;
+  }
+
+  /* Tertiary: outline resolves to a real border on hover. */
+  .btn-quiet {
+    @apply inline-flex h-12 items-center justify-center border border-transparent bg-transparent
+      px-6 text-body-sm font-medium text-foreground
+      transition-colors duration-150
+      hover:border-foreground
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground;
+  }
+
+  /* Accent action — at most one per page, for the highest-value step. */
+  .btn-accent {
+    @apply inline-flex h-12 items-center justify-center border border-accent bg-accent
+      px-6 text-body-sm font-medium text-accent-foreground
+      transition-colors duration-150
+      hover:border-accent-hover hover:bg-accent-hover
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+
+  /* Standard card — hairline, no shadow, no hover lift. */
+  .card-line {
+    @apply border border-border bg-card p-6 lg:p-8;
+  }
+
+  /* Tonal card for secondary tiers. */
+  .card-wash {
+    @apply border border-transparent bg-muted p-6 lg:p-8;
+  }
+
+  /* Inputs: 0 radius, 1px boundary at 3.4:1, focus by border colour (no glow). */
+  .field {
+    @apply block h-12 w-full border border-input bg-background px-3.5 text-[15px] text-foreground
+      transition-colors duration-150
+      placeholder:text-muted-foreground/70
+      focus:border-foreground focus:outline-none focus:ring-0
+      aria-[invalid=true]:border-destructive;
+  }
+
+  .label {
+    @apply block text-caption font-medium text-foreground;
+  }
+
+  /* Prose rail — 68ch, inside the 50–75ch readability sweet spot. */
+  .prose-editorial { max-width: var(--measure); }
+
+  /* Section rhythm: 64 / 96 / 128px, never under 64 between sections. */
+  .section {
+    @apply py-16 sm:py-24 lg:py-32;
+  }
+  .section-rule {
+    @apply border-t border-border;
+  }
+
+  /* THE eyebrow replacement: heading + body. Two elements, nothing above. */
+  .section-head { @apply max-w-measure; }
+}
+
+/* Entrance: 8px rise, 400ms. Nothing decorative. */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal { animation: reveal 400ms cubic-bezier(0.2, 0, 0, 1) both; }
+@media (prefers-reduced-motion: reduce) { .reveal { animation: none; } }
+
+/* Scrollbar: 2px track, ink thumb, no border. */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: hsl(var(--muted)); }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border: 3px solid hsl(var(--muted));
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--foreground)); }
+
+/* iOS Safari viewport + safe-area handling. */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .safe-area-top { padding-top: env(safe-area-inset-top); }
+  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-area-left { padding-left: env(safe-area-inset-left); }
+  .safe-area-right { padding-right: env(safe-area-inset-right); }
+}
