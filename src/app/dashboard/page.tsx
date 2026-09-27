@@ -770,7 +770,7 @@ const DashboardContent = () => {
 
                           <div className="mt-6 md:mt-0 text-center md:text-right border-t md:border-t-0 border-white/10 pt-6 md:pt-0 w-full md:w-auto">
                             <p className="text-gray-400 text-[10px] mobile:text-xs mb-1 uppercase tracking-widest font-bold">Account Authority</p>
-                            <p className="text-xl mobile:text-2xl font-mono font-bold tracking-widest text-white mb-2 uppercase">{userProfile?.userCode || 'RECOVERLY_USER'}</p>
+                            <p className="text-xl mobile:text-2xl font-mono font-bold tracking-widest text-white mb-2 uppercase">{userProfile?.userCode || 'SOLARIEM_USER'}</p>
                             <div className="flex flex-col md:items-end items-center gap-2">
                               <div className="flex flex-wrap gap-2 justify-center md:justify-end">
                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${userProfile?.emailVerified

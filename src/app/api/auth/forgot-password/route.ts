@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserService } from '@/lib/auth/user';
 import { sendEmail } from '@/lib/email';
-import { SITE_URL } from '@/lib/site';
+import { APP_URL } from '@/lib/env';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Send password reset email
     try {
-      const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || SITE_URL}/reset-password/${resetToken}`;
+      const resetUrl = `${APP_URL}/reset-password/${resetToken}`;
 
       await sendEmail({
         to: email,

@@ -4,7 +4,7 @@ import { UserService } from '@/lib/auth/user';
 import { generateEmailVerificationToken } from '@/lib/auth/jwt';
 import { ObjectId } from 'mongodb';
 import { getDb } from '@/lib/mongodb';
-import { SITE_URL } from '@/lib/site';
+import { APP_URL } from '@/lib/env';
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || SITE_URL}/verify-email?token=${token}`;
+    const verificationUrl = `${APP_URL}/verify-email?token=${token}`;
     const template = emailTemplates.emailVerification(user.firstName, verificationUrl);
 
     // Send email

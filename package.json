@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:api-auth": "node scripts/check-api-auth.mjs",
+    "check:launch": "node scripts/check-launch-readiness.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "migrate:balances": "node scripts/migrate-balances-investment.mjs"
   },

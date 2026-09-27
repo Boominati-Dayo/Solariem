@@ -7,7 +7,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 import bcrypt from 'bcryptjs';
 
 const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB || 'banking_app';
+const dbName = process.env.MONGODB_DB;
 
 if (!uri) {
   console.error('MONGODB_URI is not set in .env');

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt, { TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
-import { verifyEmailVerificationToken } from '@/lib/auth/jwt';
+import { verifyEmailVerificationToken, getJwtSecret } from '@/lib/auth/jwt';
 import { UserService } from '@/lib/auth/user';
 import { NotificationService } from '@/lib/notifications/NotificationService';
 import { getDb } from '@/lib/mongodb';
@@ -45,7 +45,11 @@ export async function POST(request: NextRequest) {
       // Distinguish "expired" from "invalid" so the UI can show useful messaging.
       let code = 'invalid_token';
       try {
-        jwt.verify(token, process.env.JWT_SECRET || '');
+        // getJwtSecret() rather than process.env.JWT_SECRET || ''. An empty
+        // string is a valid signing key to jsonwebtoken, so this branch would
+        // verify tokens against "" and report a genuine expired token as
+        // invalid, telling the user to request a new link they do not need.
+        jwt.verify(token, getJwtSecret());
       } catch (err) {
         if (err instanceof TokenExpiredError) code = 'expired_token';
       }

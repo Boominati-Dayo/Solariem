@@ -27,7 +27,7 @@ import './load-env.mjs';
 import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB || 'banking_app';
+const dbName = process.env.MONGODB_DB;
 
 const argv = new Set(process.argv.slice(2));
 const apply = argv.has('--apply');

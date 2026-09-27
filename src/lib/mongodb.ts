@@ -1,14 +1,17 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
+import { requireEnv, describeConfig } from './env';
 
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB || 'banking_app';
+// No fallback for the database name in production. It previously defaulted to
+// 'banking_app', a leftover from the original template, so a missing MONGODB_DB
+// would have quietly pointed the app at a differently-named database. The dev
+// fallback below is only reached when the variable is genuinely unset, and
+// requireEnv() throws instead in production.
+const dbName = requireEnv('MONGODB_DB', process.env.MONGODB_DB, 'Banking-Refund');
 
 let client: MongoClient | null = null;
 
 function getClient(): MongoClient {
-  if (!uri) {
-    throw new Error('Please define the MONGODB_URI environment variable inside .env');
-  }
+  const uri = requireEnv('MONGODB_URI', process.env.MONGODB_URI);
   if (!client) {
     client = new MongoClient(uri, {
       serverApi: {
@@ -26,10 +29,19 @@ function getClient(): MongoClient {
   return client;
 }
 
+let configLogged = false;
+
 export async function connectToDatabase() {
   try {
     const c = getClient();
     const db = c.db(dbName);
+    if (!configLogged) {
+      configLogged = true;
+      // Printed once, and never a secret. Worth having in the platform logs:
+      // the most common production misconfiguration is silently running against
+      // the wrong site URL or database, and this is where that shows up.
+      console.log('[config]\n' + describeConfig());
+    }
     return { client: c, db };
   } catch (error) {
     console.error('MongoDB connection error:', error);

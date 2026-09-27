@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { getCurrencySymbol } from '@/lib/currencies';
 import { SITE_URL, ORG } from '@/lib/site';
+import { requireEnv, APP_URL } from '@/lib/env';
 
 interface EmailOptions {
   to: string;
@@ -11,10 +12,15 @@ interface EmailOptions {
 
 // Create reusable transporter object using the default SMTP transport
 const createTransporter = () => {
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT || '587');
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD;
+  // No host/port defaults. These used to fall back to smtp.gmail.com:587, which
+  // is the development mailbox. A production deploy that lost SMTP_HOST would
+  // have quietly tried to authenticate the business sending identity against a
+  // personal Gmail account, and the send failure would surface as a nodemailer
+  // error at the point of sending rather than as a configuration fault.
+  const host = requireEnv('SMTP_HOST', process.env.SMTP_HOST, 'smtp.gmail.com');
+  const port = parseInt(requireEnv('SMTP_PORT', process.env.SMTP_PORT, '587'), 10);
+  const user = requireEnv('SMTP_USER', process.env.SMTP_USER);
+  const pass = requireEnv('SMTP_PASS', process.env.SMTP_PASS);
 
   // Google displays app passwords as four groups of four ("ghae zrqk wlls
   // hxgn") and it is very easy to paste them with the spaces intact. The space
@@ -22,12 +28,7 @@ const createTransporter = () => {
   // where it expects 16 and rejects AUTH with a generic
   // "535 Incorrect login or password". Stripping here means the pasted-as-shown
   // form works, instead of failing with an error that points at the wrong thing.
-  const secret = pass ? pass.replace(/\s+/g, '') : pass;
-
-  if (!user || !pass) {
-    console.warn('SMTP credentials not found. Emails will not be sent.');
-    return null;
-  }
+  const secret = pass.replace(/\s+/g, '');
 
   return nodemailer.createTransport({
     host,
@@ -49,11 +50,11 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
       return;
     }
 
-    // The From: header. Gmail only permits the authenticated address or a
-    // verified Workspace alias, so EMAIL_FROM must be set to a real mailbox and
-    // falls back to SMTP_USER rather than to the public contact address, which
-    // is not a sending identity during the development phase.
-    const from = process.env.EMAIL_FROM || `"${ORG.name}" <${process.env.SMTP_USER || ORG.email}>`;
+    // The From: header. On Google this must be the authenticated address or a
+    // verified Workspace alias, so it is required rather than guessed. Falling
+    // back to the public contact address would put a From: on the wire that the
+    // SMTP server is not authorised to send as.
+    const from = requireEnv('EMAIL_FROM', process.env.EMAIL_FROM, `"${ORG.name}" <${process.env.SMTP_USER || ORG.email}>`);
 
     const info = await transporter.sendMail({
       from,
@@ -75,7 +76,7 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
 export const getBaseTemplate = (title: string, content: string, userName?: string) => {
   const year = new Date().getFullYear();
   const appName = ORG.name;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || SITE_URL;
+  const appUrl = APP_URL;
   // The public contact address, so a recipient who wants to verify the sender
   // has a real one to check against. Kept in sync with the site by importing
   // ORG rather than repeating the string in a template.

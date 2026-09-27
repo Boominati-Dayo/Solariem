@@ -3,7 +3,7 @@ import { UserService } from '@/lib/auth/user';
 import { validatePassword } from '@/lib/auth/password';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { NotificationService } from '@/lib/notifications/NotificationService';
-import { SITE_URL } from '@/lib/site';
+import { APP_URL } from '@/lib/env';
 
 export async function POST(request: NextRequest) {
   try {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     // Send verification email
     try {
-      const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || SITE_URL}/verify-email?token=${result.emailVerificationToken}`;
+      const verificationUrl = `${APP_URL}/verify-email?token=${result.emailVerificationToken}`;
       const template = emailTemplates.emailVerification(result.user.firstName, verificationUrl);
 
       await sendEmail({

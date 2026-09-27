@@ -62,6 +62,22 @@ export interface JWTPayload {
   isAdmin: boolean;
 }
 
+/**
+ * The signing key actually in use, after the development fallback has been
+ * applied.
+ *
+ * Callers that need to verify a token themselves must use this rather than
+ * reading process.env.JWT_SECRET. In development the two differ — the resolved
+ * key is the ephemeral per-process random value, so verifying against the
+ * unset environment variable compares against nothing. That path previously
+ * passed an empty string to jwt.verify, which is a valid key, so an expired
+ * token was reported as invalid and the user was told to request a new
+ * verification link they did not need.
+ */
+export function getJwtSecret(): string {
+  return JWT_SECRET;
+}
+
 export function generateToken(payload: JWTPayload): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as Record<string, unknown>);
 }

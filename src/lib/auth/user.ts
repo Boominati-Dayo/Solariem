@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { hashPassword, verifyPassword } from './password';
 import { hashPin } from './pin';
 import { generateToken, generateEmailVerificationToken, generatePasswordResetToken } from './jwt';
-import { SITE_URL } from '@/lib/site';
+import { APP_URL } from '@/lib/env';
 
 export interface User {
   _id?: string | ObjectId;
@@ -534,7 +534,7 @@ export class UserService {
   }
 
   static generateReferralLink(userCode: string): string {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || SITE_URL;
+    const baseUrl = APP_URL;
     return `${baseUrl}/signup?ref=${userCode}`;
   }
 

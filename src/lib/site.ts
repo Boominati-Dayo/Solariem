@@ -24,11 +24,16 @@
 /* ------------------------------------------------------------------ */
 
 /**
- * Canonical origin. Set to the real domain once it is registered — every
- * canonical URL, Open Graph tag, sitemap entry and JSON-LD @id derives from
- * this value, so it must never point at a domain we do not control.
+ * Canonical origin. Every canonical URL, Open Graph tag, sitemap entry and
+ * JSON-LD @id derives from this value, so it must never point at a domain we do
+ * not control.
+ *
+ * Delegated to SITE_URL in ./env, which refuses to serve with a placeholder in
+ * production. Previously this was `|| 'http://localhost:3000'`, which meant a
+ * deploy that forgot the variable published localhost as the canonical origin
+ * for the entire site and looked healthy doing it.
  */
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+export { SITE_URL } from './env';
 
 export const ORG = {
   name: 'Solariem',
