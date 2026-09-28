@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FAQS, FEES, ORG } from '@/lib/site';
+import CardRail from '@/components/CardRail';
 
 export const metadata: Metadata = {
   title: 'Hold money in several currencies',
@@ -117,7 +118,16 @@ export default function BankingPage() {
         </div>
       </section>
 
-      {/* Currencies */}
+      {/* Currencies. The clearest case for a rail on the whole site: seven
+          items, every one of them three letters and a name, all the same
+          height, none of them worth more than a glance. The old grid put them
+          4-up, which meant the seventh sat alone on a second row under an empty
+          gap — a 2-3-2 arrangement that reads as a mistake. Side by side they
+          are one continuous run, and adding a currency later extends it instead
+          of reflowing it.
+
+          `columns={4}` because at `lg` this becomes a 4-wide grid, matching
+          the old layout as closely as a rail can. */}
       <section className="section section-rule">
         <div className="mx-auto max-w-container px-5 sm:px-8">
           <header className="section-head">
@@ -127,14 +137,14 @@ export default function BankingPage() {
               separate, and you convert when you choose to rather than when we decide to.
             </p>
           </header>
-          <ul className="mt-14 grid grid-cols-2 gap-px border border-border bg-border sm:grid-cols-3 lg:grid-cols-4">
+          <CardRail label="Currencies you can hold" columns={4} className="mt-14">
             {CURRENCIES.map((c) => (
-              <li key={c.code} className="bg-background px-6 py-8">
+              <li key={c.code}>
                 <p className="font-mono text-h3 tabular-nums text-foreground">{c.code}</p>
                 <p className="mt-1 text-caption text-muted-foreground">{c.name}</p>
               </li>
             ))}
-          </ul>
+          </CardRail>
         </div>
       </section>
 

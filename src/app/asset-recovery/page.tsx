@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FAQS, FEES, TIMELINE } from '@/lib/site';
+import CardRail from '@/components/CardRail';
 import PhotoBackdrop from '@/components/PhotoBackdrop';
 import ScrollProgress from '@/components/ScrollProgress';
 import FraudInvestigationImg from '@/assets/images_for_pages/financialfraudinvestigation.png';
@@ -177,60 +178,71 @@ export default function AssetRecoveryPage() {
       {/* What we need */}
       <section className="section section-rule">
         <div className="mx-auto max-w-container px-5 sm:px-8">
-          <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
-            <header className="section-head lg:col-span-5">
-              <h2 className="text-h2 text-foreground">What to send us.</h2>
-              <p className="mt-5 text-lead text-muted-foreground">
-                Missing documents are the most common reason a case stalls. Send everything you have,
-                even the parts that look irrelevant.
-              </p>
-            </header>
-            {/* Cards, not a ruled list. These are five independent documents a
-                reader is scanning for one of, not a comparison. As rows they
-                ran the full height of the section on a phone with nothing but
-                hairlines between items. */}
-            <ul className="card-grid-2 lg:col-span-7">
-              {DOCS.map((d, i) => (
-                <li key={d} className="flex flex-col">
-                  <span className="card-index" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <p className="text-body text-foreground">{d}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* The heading now sits above the rail rather than beside it. In the
+              old 5/7 split the list had seven columns to work with, and a rail
+              in seven columns is a rail of slivers — each card would be about
+              half the width it is now. A horizontal list needs the full measure
+              to have anything to scroll across, so the header goes on top and
+              the track gets the whole container. At `lg` the rail becomes a
+              three-column grid, which is the same shape this section had. */}
+          <header className="section-head">
+            <h2 className="text-h2 text-foreground">What to send us.</h2>
+            <p className="mt-5 text-lead text-muted-foreground">
+              Missing documents are the most common reason a case stalls. Send everything you have,
+              even the parts that look irrelevant.
+            </p>
+          </header>
+          <CardRail label="Documents to send us" columns={3} className="mt-14">
+            {DOCS.map((d, i) => (
+              <li key={d} className="flex flex-col">
+                <span className="card-index" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <p className="text-body text-foreground">{d}</p>
+              </li>
+            ))}
+          </CardRail>
         </div>
       </section>
 
       {/* Honest limits */}
       <section className="section section-rule">
         <div className="mx-auto max-w-container px-5 sm:px-8">
-          <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
-            <header className="section-head lg:col-span-5">
-              <h2 className="text-h2 text-foreground">When a case is not worth pursuing.</h2>
-              <p className="mt-5 text-lead text-muted-foreground">
-                We will tell you if your case falls into one of these, rather than take a file and a
-                fee and hope. A fast no is more useful to you than a slow maybe.
-              </p>
-            </header>
-            {/* Four independent disqualifiers. Cards, because a reader is
-                looking for "is mine one of these" and a card gives each one a
-                shape to be recognised by. */}
-            <ul className="card-grid-2 lg:col-span-7">
-              {NOT_WORTH_IT.map((n) => (
-                <li key={n} className="flex">
-                  <span
-                    aria-hidden="true"
-                    className="mt-[0.3rem] mr-4 inline-flex h-5 w-5 shrink-0 items-center justify-center border border-border text-[0.6rem] leading-none text-muted-foreground"
-                  >
-                    &times;
-                  </span>
-                  <p className="text-body text-muted-foreground">{n}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Four independent disqualifiers, and the third rail on the site.
+              This is the marginal case and it earns its place for a specific
+              reason: a reader arrives here to answer one question — is my case
+              one of these? — and a rail turns that into a single pass along a
+              row rather than a scroll down a column. The items run 74-104
+              characters, which is the top of what reads well at
+              `min(20rem, 82%)`, so this is as long as a rail should get. The
+              next section is deliberately left as a grid: one of its items is
+              178 characters and would break into a narrow unreadable column.
+
+              The header moved above, as with the rail above this one. Four is
+              the smallest list worth a rail — at 82% card width one and a bit
+              are visible, so there is a real second screen to reach and a real
+              reason to swipe. At `lg` it is a four-wide grid on one row, which
+              is the neatest version this section has had. */}
+          <header className="section-head">
+            <h2 className="text-h2 text-foreground">When a case is not worth pursuing.</h2>
+            <p className="mt-5 text-lead text-muted-foreground">
+              We will tell you if your case falls into one of these, rather than take a file and a
+              fee and hope. A fast no is more useful to you than a slow maybe.
+            </p>
+          </header>
+          <CardRail label="Cases we will not pursue" columns={4} className="mt-14">
+            {NOT_WORTH_IT.map((n) => (
+              <li key={n} className="flex">
+                <span
+                  aria-hidden="true"
+                  className="mt-[0.3rem] mr-4 inline-flex h-5 w-5 shrink-0 items-center justify-center border border-border text-[0.6rem] leading-none text-muted-foreground"
+                >
+                  &times;
+                </span>
+                <p className="text-body text-muted-foreground">{n}</p>
+              </li>
+            ))}
+          </CardRail>
         </div>
       </section>
 

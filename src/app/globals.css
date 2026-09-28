@@ -429,6 +429,124 @@
       border-accent px-1 font-mono text-data tabular-nums text-muted-foreground;
   }
 
+  /* --- card rail ----------------------------------------------------------
+     Drives <CardRail>. A horizontal scroller below `lg` that becomes an
+     ordinary grid at `lg` and above, from the same markup and with no
+     JavaScript: scroll position is never read, only styled.
+
+     THE CARD WIDTH IS THE WHOLE DESIGN. `min(20rem, 82%)` is deliberate in both
+     halves. The 82% leaves roughly a fifth of the next card visible, which is
+     the affordance — a reader can see there is something to the right without
+     needing a scrollbar or a button. The `20rem` cap stops the cards becoming
+     absurdly wide on a large tablet in portrait. Critically, 82% means a card
+     can never be wider than its container, which is what makes `scroll-snap-type:
+     mandatory` safe: mandatory snapping refuses to let the reader scroll past
+     an item wider than the viewport, so if that ever stopped being true the
+     list would lock. If you change this width, re-check that relationship.
+
+     `overscroll-behavior-x: contain` is load-bearing, not a nicety. Without it
+     a horizontal swipe near the end of the list fires the browser's back
+     gesture on mobile and throws the reader out of the page entirely. This is
+     the most common defect in a horizontal list and it is invisible on desktop.
+
+     `-webkit-overflow-scrolling: touch` is a no-op in every current engine but
+     is kept out of the file on purpose; the property is gone and re-adding it
+     would only suggest momentum still needs help.
+
+     The scrollbar is hidden rather than restyled, but NOT without a
+     replacement: the peeked card is the replacement, and `scrollbar-width: none`
+     is set alongside the WebKit pseudo-element because Firefox and WebKit need
+     different properties to do the same job. A keyboard user still has the
+     focus ring below, and arrow keys scroll a focused overflow container
+     natively, so nothing is lost — the scrollbar was never the accessible
+     affordance, focus was.
+
+     The focus ring matters more here than anywhere else on the site, because
+     this is the one list that becomes focusable. `.card-grid` and friends are
+     not focusable at all. The ring is inset so it is not clipped by
+     `overflow: auto`, and it uses the ink colour rather than a browser default
+     so it is visible against both the card and the page. */
+  .rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(20rem, 82%);
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* The bleed. A rail flush to the container edge looks like a mistake,
+       because the card at either end appears clipped by the layout rather than
+       by the viewport. Pulling the track out to the page gutter and padding it
+       back means the first and last cards sit on the same margin as the
+       heading above them, while the middle ones still run off screen. */
+    margin-inline: -1.25rem;
+    padding-inline: 1.25rem;
+    /* This is what makes the bleed survive snapping, and it has to be here on
+       the SCROLL CONTAINER rather than on the cards. `scroll-padding` defines
+       the inset a snap target is allowed to rest at, so it is a property of the
+       box that scrolls: put it on `.rail > *` and it does nothing at all,
+       because the children are not scroll containers. Without it, a snapped
+       card comes to rest against the raw scrollport edge — which, given the
+       negative margin above, is off the side of the screen and looks exactly
+       like the card has been cut in half. */
+    scroll-padding-inline: 1.25rem;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+    @apply border border-border bg-card p-6 lg:p-8;
+  }
+  .rail:focus-visible {
+    outline: 2px solid hsl(var(--foreground));
+    /* Inset so the ring draws inside the scrollport rather than being clipped
+       away by overflow: auto. */
+    outline-offset: -2px;
+  }
+  @media (min-width: 1024px) {
+    .rail {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      overflow-x: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      /* The snap inset from the mobile rules is meaningless once the track no
+         longer scrolls, and it would go on to constrain nothing at all. */
+      scroll-padding-inline: 0;
+      /* Back to a ruled block: at this width the shared border reads as one
+         panel again, which is the same treatment .card-grid gets. */
+      border: 1px solid hsl(var(--border));
+      background-color: hsl(var(--border));
+    }
+    .rail > * {
+      border: 0;
+      background-color: hsl(var(--card));
+    }
+    .rail-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .rail-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .rail:focus-visible {
+      outline-offset: 2px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* Nothing here animates on its own, so there is nothing to disable — but
+       `scroll-behavior: smooth` is a property someone will add to this rule one
+       day to make the snap feel nicer, and on a reduced-motion machine that
+       turns a list into something that drifts under the reader. Declared here
+       so the default is the safe one. */
+    .rail {
+      scroll-behavior: auto;
+    }
+  }
+
   /* --- scroll-scrubbed section -------------------------------------------
      Drives <ScrollProgress>. A wrapper whose height sets the length of the
      pinned run, containing a panel that sticks to the top of the viewport for
