@@ -144,16 +144,17 @@ export default function BankingPage() {
           <header className="section-head">
             <h2 className="text-h2 text-foreground">What the account does.</h2>
           </header>
-          <dl className="mt-16 divide-y divide-border border-y border-border">
+          {/* Independent capabilities, none of which is a column of a
+              comparison. Three up, so a three-sentence capability still gets a
+              readable measure rather than a full-width line of text. */}
+          <ul className="card-grid mt-16">
             {FEATURES.map((f) => (
-              <div key={f.title} className="grid grid-cols-1 gap-2 py-8 md:grid-cols-12 md:gap-6">
-                <dt className="text-h4 text-foreground md:col-span-4">{f.title}</dt>
-                <dd className="max-w-measure text-body text-muted-foreground md:col-span-8">
-                  {f.body}
-                </dd>
-              </div>
+              <li key={f.title}>
+                <h3 className="text-h4 text-foreground">{f.title}</h3>
+                <p className="mt-3 text-body text-muted-foreground">{f.body}</p>
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
       </section>
 

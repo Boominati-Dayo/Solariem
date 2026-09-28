@@ -25,6 +25,16 @@
     --muted-foreground: 40 4.4% 40.2%;   /* 5.27:1 on background */
     --subtle-foreground: 42 5.8% 43.7%;
 
+    /* --sp-body is the body-copy colour used ONLY inside a <ScrollProgress>
+       section, and it exists because the other two options are both wrong.
+       --muted-foreground (5.27:1 on bone) has 0.77 of headroom before AA, so a
+       tint strong enough to actually see spends essentially all of it in the
+       first tenth of the scroll; --foreground (17.65:1) is not muted at all
+       and the section loses its typographic hierarchy. This sits between them.
+       Measured, not guessed — scripts/audit-scroll-progress.mjs composites the
+       whole layer stack at every 0.005 of --progress and reports the worst. */
+    --sp-body: 40 8% 34%;         /* #5E5950 — 6.60:1 on bone */
+
     --accent: 172 73.1% 20.4%;     /* #0E5A50 verdigris — 7.68:1 AAA */
     --accent-foreground: 0 0% 100%;
     --accent-subtle: 154 16.3% 91.6%;
@@ -97,6 +107,11 @@
     --muted: 20 4.5% 13.1%;
     --muted-foreground: 40 5.6% 58%;
     --subtle-foreground: 40 3.7% 52.4%;
+    /* Lighter than the light-theme value for the same reason it is darker
+       there: the scrubbed background lightens as the scroll runs, so the body
+       copy has to start with headroom against the WORST frame, not against the
+       panel at progress 0. */
+    --sp-body: 45 12% 74%;
     --accent: 169 28.9% 49.6%;
     --accent-foreground: 40 10.3% 5.7%;
     --accent-subtle: 157 31% 11.4%;
@@ -276,51 +291,63 @@
      Drives <PhotoBackdrop>. The image fills the section, then two scrims go
      over it: a directional one so the copy always lands on the solid end
      whatever the photo contains, and a brand tint so the section still reads
-     as ours and the image reads as texture rather than a stock picture in a
-     box. This is the fix for "a separate image by the side" -- it lets a real
-     photograph carry a whole section instead of sitting in a frame beside the
-     words. ------------------------------------------------------------------- */
+     as ours.
+
+     The ramp shape matters more than the numbers. It holds near-opaque through
+     the copy, then falls away fast so the far end of the photo is genuinely
+     visible. An earlier version of this ran 0.94 -> 0.3, which combined with a
+     15% image opacity worked out to roughly 8% visible photo — i.e. invisible.
+     Multiplying two low-contrast values hides the image twice over. So: the
+     IMAGE is at full strength and the SCRIM alone does the protecting, rather
+     than both being faded at once. ------------------------------------------ */
   .photo-scrim {
     background: linear-gradient(
       to top,
       hsl(var(--background)) 0%,
-      hsl(var(--background) / 0.94) 34%,
-      hsl(var(--background) / 0.55) 66%,
-      hsl(var(--background) / 0.3) 100%
+      hsl(var(--background) / 0.96) 36%,
+      hsl(var(--background) / 0.84) 58%,
+      hsl(var(--background) / 0.48) 78%,
+      hsl(var(--background) / 0.12) 100%
     );
   }
   .dark .photo-scrim {
     background: linear-gradient(
       to top,
       hsl(var(--background)) 0%,
-      hsl(var(--background) / 0.93) 36%,
-      hsl(var(--background) / 0.6) 68%,
-      hsl(var(--background) / 0.35) 100%
+      hsl(var(--background) / 0.95) 36%,
+      hsl(var(--background) / 0.82) 58%,
+      hsl(var(--background) / 0.46) 78%,
+      hsl(var(--background) / 0.14) 100%
     );
   }
-  /* Horizontal variant, for a section whose copy runs down the left edge --
-     a hero, or a two-column band with a photo behind it. The vertical scrim
-     above protects copy that sits in the lower half; this one protects copy
-     that occupies the full height of the left side, which is the shape of
-     most hero copy. On a narrow viewport the layout stacks, so the fallback
-     in the media query puts the protection back under the text instead of
-     leaving the copy stranded over the busiest part of the photo. */
+
+  /* The copy in a hero is a `max-w-3xl` block inside a wider centred container,
+     so it ends around 60% of the viewport, not at the gradient midpoint. The
+     stops below hold near-opaque out to that point and then fall away quickly,
+     which is what produces a clean text-left / photo-right split rather than a
+     photo that fades in under the last line of the paragraph. Below `lg` the
+     layout stacks, so this reverts to the vertical ramp to keep the copy on the
+     solid end. */
   .photo-scrim-left {
     background: linear-gradient(
       to right,
       hsl(var(--background)) 0%,
-      hsl(var(--background) / 0.95) 38%,
-      hsl(var(--background) / 0.72) 58%,
-      hsl(var(--background) / 0.45) 100%
+      hsl(var(--background) / 0.98) 42%,
+      hsl(var(--background) / 0.94) 58%,
+      hsl(var(--background) / 0.82) 70%,
+      hsl(var(--background) / 0.45) 84%,
+      hsl(var(--background) / 0.08) 100%
     );
   }
   .dark .photo-scrim-left {
     background: linear-gradient(
       to right,
       hsl(var(--background)) 0%,
-      hsl(var(--background) / 0.94) 40%,
-      hsl(var(--background) / 0.74) 60%,
-      hsl(var(--background) / 0.48) 100%
+      hsl(var(--background) / 0.97) 42%,
+      hsl(var(--background) / 0.93) 58%,
+      hsl(var(--background) / 0.8) 70%,
+      hsl(var(--background) / 0.44) 84%,
+      hsl(var(--background) / 0.1) 100%
     );
   }
   @media (max-width: 1023px) {
@@ -328,19 +355,23 @@
       background: linear-gradient(
         to top,
         hsl(var(--background)) 0%,
-        hsl(var(--background) / 0.94) 46%,
-        hsl(var(--background) / 0.55) 78%,
-        hsl(var(--background) / 0.3) 100%
+        hsl(var(--background) / 0.96) 46%,
+        hsl(var(--background) / 0.8) 68%,
+        hsl(var(--background) / 0.34) 86%,
+        hsl(var(--background) / 0.1) 100%
       );
     }
   }
 
+  /* Brand cast over the photo. Multiply, and very low alpha: the point is for
+     the image to read as ours rather than as stock, not to tint it. Higher
+     than this and it muddies the photograph it is supposed to be protecting. */
   .photo-tint {
-    background-color: hsl(var(--accent) / 0.14);
+    background-color: hsl(var(--accent) / 0.1);
     mix-blend-mode: multiply;
   }
   .dark .photo-tint {
-    background-color: hsl(var(--accent) / 0.2);
+    background-color: hsl(var(--accent) / 0.16);
     mix-blend-mode: screen;
   }
 
@@ -351,6 +382,141 @@
   /* Tonal card for secondary tiers. */
   .card-wash {
     @apply border border-transparent bg-muted p-6 lg:p-8;
+  }
+
+  /* --- card grids ---------------------------------------------------------
+     The site was almost entirely `divide-y` rows, which is the right shape for
+     genuinely tabular content (privacy's data/purpose/retention columns) and
+     the wrong shape for a list of independent things a reader is scanning for
+     ("what to send us", "what the account does"). Rows waste vertical space on
+     a phone and force the reader down a single column of hairlines.
+
+     So: cards where the items are independent and scannable, rows kept where
+     the content is genuinely a comparison. Both stay in the codebase — the
+     point was never to remove tables, it was to stop using one shape for
+     everything.
+
+     `gap-px` on a `bg-border` container draws the 1px rules in the border
+     colour, so a grid of cards reads as one ruled block rather than as a row
+     of separate boxes. No per-card borders to double up at the seams. ----- */
+  .card-grid {
+    @apply grid grid-cols-1 gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-3;
+  }
+  .card-grid > * {
+    @apply bg-card px-6 py-8 lg:px-8 lg:py-10;
+  }
+  /* Two-up, for lists of four to six where a third column would leave cards too
+     narrow to hold a sentence. */
+  .card-grid-2 {
+    @apply grid grid-cols-1 gap-px border border-border bg-border md:grid-cols-2;
+  }
+  .card-grid-2 > * {
+    @apply bg-card px-6 py-8 lg:px-8 lg:py-10;
+  }
+
+  /* A card that is a whole unit rather than a fragment of a ruled block: real
+     border, real spacing, so a short list of cards does not read as a table
+     with the lines filled in. Used where there are only three or four items and
+     a hard ruled block would be over-formal. */
+  .card-unit {
+    @apply border border-border bg-card p-6 transition-colors duration-150 hover:border-foreground/40 lg:p-8;
+  }
+
+  /* The number/marker that sits in a card's corner. Same accent bar the
+     process rows use, so the two read as the same system. */
+  .card-index {
+    @apply mb-5 inline-flex h-7 min-w-[1.75rem] items-center justify-center border-t-[3px]
+      border-accent px-1 font-mono text-data tabular-nums text-muted-foreground;
+  }
+
+  /* --- scroll-scrubbed section -------------------------------------------
+     Drives <ScrollProgress>. A wrapper whose height sets the length of the
+     pinned run, containing a panel that sticks to the top of the viewport for
+     that whole distance. Layers over the panel fade in one after another as
+     --progress climbs 0 -> 1, so the background fills progressively rather
+     than cross-fading as a single block.
+
+     Writing a comment in a CSS file has one hard rule: the two-character
+     sequence that terminates a comment must not appear anywhere in the body,
+     not even inside backticks or quotes, or the rest of the prose gets parsed
+     as CSS and the build fails with an error a long way from the real cause.
+     (It bit this file once: a note about that rule contained the rule.) So the
+     dashes above and below are decoration only, and the closer is the very last
+     two characters of the block.
+
+     `--progress` is written by the component on the WRAPPER and read by the
+     layers. It is deliberately NOT registered with @property, so there is no
+     initial-value or syntax declaration to get wrong, and no browser upgrade
+     path to think about. The `clamp(0, …, 1)` in the opacity expression is what
+     bounds it: the result is restricted to 0..1 no matter what the script
+     writes, so a bad measurement cannot paint a layer at opacity 4.
+
+     The fade is `(var(--progress) - var(--at)) * 40`, so a layer goes from
+     invisible to opaque over a window of 1/40 = 2.5% of the scroll distance.
+     That is what makes it a progressive fill rather than a set of abrupt
+     switches. The multiplier is a design constant — how many percent of the
+     scroll distance is each crossfade — and `scripts/audit-scroll-progress.mjs`
+     parses it out of this rule rather than repeating it, so the audit cannot
+     drift out of step with the CSS it is auditing.
+
+     `.sp-layer` has no opacity declaration of its own; it reads 0 until
+     --progress is written, so nothing is painted before the script runs and a
+     no-JS reader sees the panel's own background rather than a fully-painted
+     panel with the transition silently missing. */
+  .scroll-progress {
+    /* The scroll distance the section occupies. The panel pins for all of it,
+       so this is effectively "how long does the reader stay pinned". */
+    --sp-distance: 180vh;
+    position: relative;
+    height: var(--sp-distance);
+  }
+  .scroll-progress-panel {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh; /* mobile browser chrome collapsing during scroll */
+    overflow: hidden;
+    background-color: hsl(var(--background));
+  }
+  .sp-layer {
+    position: absolute;
+    inset: 0;
+    opacity: clamp(0, calc((var(--progress, 0) - var(--at, 0)) * 40 * var(--strength, 1)), 1);
+    /* No transition: the value is already scrubbed frame by frame, and easing
+       it here would make it lag the scroll position. */
+  }
+
+  /* Body copy inside a scroll-scrubbed section. Use this INSTEAD of
+     text-muted-foreground for any text in a <ScrollProgress> panel, including
+     the small step counters — those were the last holdout, and they were the
+     pair that actually failed at 3.62:1, because they are the smallest text on
+     the section and so the least able to absorb the tint.
+
+     Do not widen this to the rest of the site. It is a darker grey than
+     --muted-foreground on purpose, and outside a section whose background
+     moves there is no reason to spend the contrast. The reason it exists at all
+     is in the token comment above. */
+  .text-sp-body {
+    color: hsl(var(--sp-body));
+  }
+
+  /* Reduced motion: no pinning, no scrubbing, nothing that moves on its own.
+     The section becomes an ordinary static block with every layer shown, so the
+     content is fully readable and the progressive background is simply present
+     rather than animated. This is the whole accessibility story for a pinned
+     section — pinning strands text under a fixed overlay for anyone tabbing
+     through it, which is exactly what this setting asks us to avoid. */
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-progress {
+      height: auto;
+    }
+    .scroll-progress-panel {
+      position: static;
+      height: auto;
+    }
+    .sp-layer {
+      opacity: 1;
+    }
   }
 
   /* Inputs: 0 radius, 1px boundary at 3.4:1, focus by border colour (no glow). */

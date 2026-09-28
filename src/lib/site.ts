@@ -92,13 +92,14 @@ export const ORG = {
    * routes to this address yet — enquiries are delivered to ADMIN_EMAIL. The two
    * converge when the domain and business mailbox are provisioned.
    *
-   * SPELLING: `solarimtrustbank` is not `solariem`. It is as specified, but the
-   * brand is Solariem everywhere else, and a transposed letter in a domain is
-   * expensive to fix later — it is a phishing-lookalike risk in a business whose
-   * entire value proposition is that people can check who they are dealing with.
-   * Worth confirming before the domain is registered.
+   * SPELLING: `solariemtrustbank`, matching ORG.legalName. This was raised
+   * before the domain was registered because a transposed letter in a domain
+   * is expensive to fix later, and `solarimtrustbank.com` is a
+   * phishing-lookalike risk in a business whose entire value proposition is
+   * that people can check who they are dealing with. Confirmed by the owner
+   * 2026-09-28 as Solariem Trust Bank, so the address is correct as written.
    */
-  email: 'info@solarimtrustbank.com',
+  email: 'info@solariemtrustbank.com',
   phone: '+1 800 555 0199',
   areaServed: ['GB', 'US', 'SG', 'AE'],
   addresses: [

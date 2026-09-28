@@ -170,19 +170,21 @@ export default function AboutPage() {
               unhappy.
             </p>
           </header>
-          <dl className="mt-16 divide-y divide-border border-y border-border">
-            {PRINCIPLES.map((p) => (
-              <div
-                key={p.title}
-                className="grid grid-cols-1 gap-2 py-8 md:grid-cols-12 md:gap-6"
-              >
-                <dt className="text-h4 text-foreground md:col-span-4">{p.title}</dt>
-                <dd className="max-w-measure text-body text-muted-foreground md:col-span-8">
-                  {p.body}
-                </dd>
-              </div>
+          {/* Four commitments, each independent. Cards rather than a two-column
+              ruled list, because the whole point of this section is that each
+              of the four stands alone — a reader scanning for the one that
+              matters to them should be able to see it whole. */}
+          <ul className="card-grid-2 mt-16">
+            {PRINCIPLES.map((p, i) => (
+              <li key={p.title}>
+                <span className="card-index" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 className="text-h4 text-foreground">{p.title}</h3>
+                <p className="mt-3 text-body text-muted-foreground">{p.body}</p>
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
       </section>
 

@@ -17,27 +17,27 @@ export default function ServiceSplit() {
           </p>
         </header>
 
-        <dl className="mt-16 divide-y divide-border border-y border-border">
-          {SERVICES.map((s) => (
-            <div
-              key={s.name}
-              className="grid grid-cols-1 gap-x-8 gap-y-4 py-10 md:grid-cols-12"
-            >
-              <dt className="md:col-span-4">
-                <h3 className="text-h3 text-foreground">{s.headline}</h3>
-                <Link
-                  href={s.url}
-                  className="mt-4 inline-block text-body-sm font-medium text-accent underline decoration-1 underline-offset-[5px] transition-colors hover:decoration-accent"
-                >
-                  {s.name}
-                </Link>
-              </dt>
-              <dd className="max-w-measure text-body text-muted-foreground md:col-span-8">
-                {s.body}
-              </dd>
-            </div>
+        {/* Two cards, not a ruled list. This is the section that says what the
+            company actually does, and it sits directly under the hero — a
+            visitor deciding whether to stay should be able to take in both
+            services at a glance rather than read down a column of rules. */}
+        <ul className="card-grid-2 mt-16">
+          {SERVICES.map((s, i) => (
+            <li key={s.name} className="flex flex-col">
+              <span className="card-index" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 className="text-h3 text-foreground">{s.headline}</h3>
+              <p className="mt-4 flex-1 text-body text-muted-foreground">{s.body}</p>
+              <Link
+                href={s.url}
+                className="mt-6 inline-block self-start text-body-sm font-medium text-accent underline decoration-1 underline-offset-[5px] transition-colors hover:decoration-accent"
+              >
+                {s.name}
+              </Link>
+            </li>
           ))}
-        </dl>
+        </ul>
       </div>
     </section>
   );

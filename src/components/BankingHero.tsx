@@ -18,7 +18,7 @@ export default function BankingHero() {
     <PhotoBackdrop
       image={FinanceHeroImg}
       scrim="left"
-      strength="light"
+      photo="full"
       position="center right"
       priority
       className="border-b border-border"

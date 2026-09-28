@@ -42,16 +42,17 @@ export default function WhyChooseUs() {
           </p>
         </header>
 
-        <dl className="mt-16 divide-y divide-border border-y border-border">
+        {/* Cards. The differences are the argument on this page, and a reader
+            arriving from a competitor's site is scanning for the one that
+            answers their objection. Rows made them read a list. */}
+        <ul className="card-grid-2 mt-16">
           {REASONS.map((r) => (
-            <div key={r.title} className="grid grid-cols-1 gap-2 py-8 md:grid-cols-12 md:gap-6">
-              <dt className="text-h4 text-foreground md:col-span-4">{r.title}</dt>
-              <dd className="max-w-measure text-body text-muted-foreground md:col-span-8">
-                {r.body}
-              </dd>
-            </div>
+            <li key={r.title}>
+              <h3 className="text-h4 text-foreground">{r.title}</h3>
+              <p className="mt-3 text-body text-muted-foreground">{r.body}</p>
+            </li>
           ))}
-        </dl>
+        </ul>
       </div>
     </section>
   );

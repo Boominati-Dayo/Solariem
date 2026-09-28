@@ -9,6 +9,7 @@
     "lint": "eslint",
     "check:api-auth": "node scripts/check-api-auth.mjs",
     "check:launch": "node scripts/check-launch-readiness.mjs",
+    "check:scroll-contrast": "node scripts/audit-scroll-progress.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "migrate:balances": "node scripts/migrate-balances-investment.mjs"
   },

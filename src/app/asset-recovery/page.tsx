@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FAQS, FEES, TIMELINE } from '@/lib/site';
 import PhotoBackdrop from '@/components/PhotoBackdrop';
+import ScrollProgress from '@/components/ScrollProgress';
 import FraudInvestigationImg from '@/assets/images_for_pages/financialfraudinvestigation.png';
 
 export const metadata: Metadata = {
@@ -51,7 +52,7 @@ export default function AssetRecoveryPage() {
       <PhotoBackdrop
         image={FraudInvestigationImg}
         scrim="left"
-        strength="light"
+        photo="full"
         position="center right"
         priority
         className="border-b border-border"
@@ -112,38 +113,66 @@ export default function AssetRecoveryPage() {
         </div>
       </PhotoBackdrop>
 
-      {/* Process */}
-      <section className="section section-rule">
-        <div className="mx-auto max-w-container px-5 sm:px-8">
-          <header className="section-head">
+      {/* Process. Pinned and scrubbed: the section stays put for the length of
+          the scroll and the background fills in as the reader moves through it.
+          The colour follows the case actually progressing — bone while they are
+          sending details, verdigris once we are tracing, gold once we are
+          filing — so the colour carries the same information as the step
+          counter rather than being decoration. */}
+      <ScrollProgress
+        /* The alphas below are the OUTPUT of a solve, not a guess.
+           `scripts/audit-scroll-progress.mjs` composites every layer at every
+           0.005 of --progress and reports the worst WCAG ratio, and these are
+           the values that keep body copy at AA for the whole run.
+
+           Two things the solve changed about the obvious approach:
+
+           1. The body colour had to be darkened. --muted-foreground sits at
+              5.27:1 on bone, which is 0.77 of headroom before AA — a tint
+              strong enough to perceive spends essentially all of it at once,
+              which is why the first attempt topped out at alpha 0.05 and
+              looked like nothing had happened. `text-sp-body` is the same hue
+              at 40 8% 34%, 6.60:1 base, which buys a visible ramp.
+
+           2. The ramp stays light. Going to an ink panel at the end of the
+              scroll would mean the copy colour has to invert mid-scroll, and
+              then contrast is only correct for part of the run. Bone ->
+              verdigris wash -> gold wash reads as progression without the
+              text ever changing colour. */
+        steps={[
+          { at: 0, label: 'You send us the details', background: 'hsl(var(--background))', strength: 0 },
+          { at: 0.05, label: 'You send us the details', background: 'hsl(var(--accent) / 0.05)' },
+          { at: 0.3, label: 'We establish where the money went', background: 'hsl(var(--accent) / 0.11)' },
+          { at: 0.55, label: 'We file with the institutions involved', background: 'hsl(var(--gold) / 0.07)' },
+          { at: 0.8, label: 'Funds are returned and the fee is calculated', background: 'hsl(var(--gold) / 0.12)' },
+        ]}
+        className="border-y border-border"
+      >
+        <div className="mx-auto flex h-full max-w-container flex-col justify-center px-5 py-20 sm:px-8 lg:py-28">
+          <header className="section-head max-w-measure">
             <h2 className="text-h2 text-foreground">How the work actually goes.</h2>
-            <p className="mt-5 text-lead text-muted-foreground">
+            <p className="mt-5 text-lead text-sp-body">
               Each stage below has a real legal step behind it. You can see which one your case has
               reached using the reference we give you.
             </p>
           </header>
-          <ol className="mt-16 border-t border-border">
+
+          <ol className="mt-12 grid max-w-4xl grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
             {TIMELINE.map((t, i) => (
-              <li key={t.step} className="border-b border-border py-8">
-                <div className="grid grid-cols-1 gap-x-8 gap-y-2 md:grid-cols-12 md:gap-6">
-                  <div className="flex items-start gap-4 md:col-span-4">
-                    <span
-                      aria-hidden="true"
-                      className="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center border-t-[3px] border-accent text-data tabular-nums text-muted-foreground"
-                    >
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <h3 className="text-h4 text-foreground">{t.step}</h3>
-                  </div>
-                  <p className="max-w-measure text-body text-muted-foreground md:col-span-8">
-                    {t.body}
-                  </p>
-                </div>
+              <li key={t.step} className="flex flex-col">
+                <span
+                  aria-hidden="true"
+                  className="mb-4 inline-flex h-7 min-w-[1.75rem] items-center justify-center border-t-[3px] border-accent px-1 font-mono text-data tabular-nums text-sp-body"
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 className="text-body-sm font-medium leading-snug text-foreground">{t.step}</h3>
+                <p className="mt-2 text-caption text-sp-body">{t.body}</p>
               </li>
             ))}
           </ol>
         </div>
-      </section>
+      </ScrollProgress>
 
       {/* What we need */}
       <section className="section section-rule">
@@ -156,10 +185,17 @@ export default function AssetRecoveryPage() {
                 even the parts that look irrelevant.
               </p>
             </header>
-            <ul className="lg:col-span-7">
-              {DOCS.map((d) => (
-                <li key={d} className="border-b border-border py-5 first:border-t">
-                  <p className="max-w-measure text-body text-foreground">{d}</p>
+            {/* Cards, not a ruled list. These are five independent documents a
+                reader is scanning for one of, not a comparison. As rows they
+                ran the full height of the section on a phone with nothing but
+                hairlines between items. */}
+            <ul className="card-grid-2 lg:col-span-7">
+              {DOCS.map((d, i) => (
+                <li key={d} className="flex flex-col">
+                  <span className="card-index" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p className="text-body text-foreground">{d}</p>
                 </li>
               ))}
             </ul>
@@ -178,15 +214,22 @@ export default function AssetRecoveryPage() {
                 fee and hope. A fast no is more useful to you than a slow maybe.
               </p>
             </header>
-            <div className="lg:col-span-7">
-              <ul className="border-t border-border">
-                {NOT_WORTH_IT.map((n) => (
-                  <li key={n} className="border-b border-border py-5">
-                    <p className="max-w-measure text-body text-muted-foreground">{n}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Four independent disqualifiers. Cards, because a reader is
+                looking for "is mine one of these" and a card gives each one a
+                shape to be recognised by. */}
+            <ul className="card-grid-2 lg:col-span-7">
+              {NOT_WORTH_IT.map((n) => (
+                <li key={n} className="flex">
+                  <span
+                    aria-hidden="true"
+                    className="mt-[0.3rem] mr-4 inline-flex h-5 w-5 shrink-0 items-center justify-center border border-border text-[0.6rem] leading-none text-muted-foreground"
+                  >
+                    &times;
+                  </span>
+                  <p className="text-body text-muted-foreground">{n}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -202,15 +245,22 @@ export default function AssetRecoveryPage() {
                 CFTC and FINRA. We list them so you can check us against the same list.
               </p>
             </header>
-            <div className="lg:col-span-7">
-              <ul className="border-t border-border">
-                {AGAINST_US.map((a) => (
-                  <li key={a} className="border-b border-border py-5">
-                    <p className="max-w-measure text-body text-foreground">{a}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* The FTC/SEC/CFTC/FINRA marks of a fraudulent firm. This list is
+                meant to be read against an external one, so each commitment
+                gets a card of its own rather than a row in a list. */}
+            <ul className="card-grid-2 lg:col-span-7">
+              {AGAINST_US.map((a) => (
+                <li key={a} className="flex">
+                  <span
+                    aria-hidden="true"
+                    className="mt-[0.15rem] mr-4 inline-flex h-5 w-5 shrink-0 items-center justify-center border border-accent/40 text-[0.7rem] leading-none text-accent"
+                  >
+                    &check;
+                  </span>
+                  <p className="text-body text-foreground">{a}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
