@@ -1,31 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
-
-/**
- * Subscribe to `prefers-reduced-motion`.
- *
- * This is an external system, so it is subscribed to rather than sampled into
- * component state from inside an effect. Sampling it in an effect and calling
- * setState from there is the cascading render `useSyncExternalStore` exists to
- * avoid, and it also gets the live-update case free: a reader who turns
- * reduced motion on mid-page gets the pin removed without a reload.
- */
-const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
-
-function subscribeReducedMotion(onChange: () => void) {
-  const mq = window.matchMedia(REDUCED_MOTION);
-  mq.addEventListener('change', onChange);
-  return () => mq.removeEventListener('change', onChange);
-}
-
-/** Server render assumes motion is wanted; the client corrects it on hydrate. */
-const reducedMotionServer = () => false;
-const reducedMotionClient = () => window.matchMedia(REDUCED_MOTION).matches;
-
-function usePrefersReducedMotion() {
-  return useSyncExternalStore(subscribeReducedMotion, reducedMotionClient, reducedMotionServer);
-}
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import usePrefersReducedMotion, { REDUCED_MOTION } from '@/lib/useReducedMotion';
 
 export type ProgressStep = {
   /** 0..1 — the point in the pinned run at which this layer becomes visible. */

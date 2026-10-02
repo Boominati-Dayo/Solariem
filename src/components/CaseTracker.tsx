@@ -153,7 +153,18 @@ export default function CaseTracker() {
 
   if (!caseData) {
     return (
-      <form onSubmit={handleTrack} className="border border-border bg-card p-6 sm:p-8 lg:p-10">
+      /* Pinned while the stages and FAQs scroll past, so the reference can be
+         typed without scrolling back up to find the box.
+
+         `.pin-aside` rather than `lg:sticky lg:top-20`: it also requires a minimum
+         viewport height, because pinning a 461px form into a 420px window holds
+         its submit button below the fold permanently. Only this branch pins — the
+         results view is a long case history the reader has to scroll through, and
+         pinning a tall element would push its bottom permanently out of reach. */
+      <form
+        onSubmit={handleTrack}
+        className="pin-aside border border-border bg-card p-6 sm:p-8 lg:p-10"
+      >
         <h2 className="text-h3 text-foreground">Find your case.</h2>
         <p className="mt-3 max-w-measure text-body-sm text-muted-foreground">
           Use the reference from your confirmation email, together with the address you gave us. The

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import CaseTracker from '@/components/CaseTracker';
+import Parallax from '@/components/Parallax';
+import { parallaxDepth } from '@/lib/parallax';
 import { FAQS, TIMELINE } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -48,18 +51,35 @@ export default function TrackClaimPage() {
                   Every case follows the same path. How far it gets depends on who received the
                   money and how quickly.
                 </p>
-                <ol className="mt-6 border-t border-border">
-                  {TIMELINE.map((t, i) => (
-                    <li key={t.step} className="border-b border-border py-4">
-                      <p className="text-body-sm text-foreground">
-                        <span className="mr-3 font-mono text-data tabular-nums text-muted-foreground">
+                {/* mt-12, not mt-8. The first step carries the deepest offset, so at
+                    the top of its run it rises 20px off its rest position; against a
+                    32px margin that left 12px of daylight under the paragraph above,
+                    which reads as cramped rather than as drift. 48px keeps 28px at the
+                    worst point of the run.
+
+                    Steps drift at slightly different rates as they pass, so the list
+                    fans out into depth instead of sliding as one flat block. Each step
+                    carries its own connector and its own number precisely so that is
+                    possible — a shared rule drawn across the rows would tear as the rows
+                    pulled apart from it. Under reduced motion the transform rule does
+                    not exist and the list is simply at rest. */}
+                <Parallax className="mt-12">
+                  <ol>
+                    {TIMELINE.map((t, i) => (
+                      <li
+                        key={t.step}
+                        className="timeline-step parallax-item"
+                        style={{ '--depth': parallaxDepth(i, TIMELINE.length) } as CSSProperties}
+                      >
+                        <span className="timeline-step-index" aria-hidden="true">
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        {t.step}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
+                        <p className="text-body-sm font-medium text-foreground">{t.step}</p>
+                        <p className="mt-2 text-body-sm text-muted-foreground">{t.body}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </Parallax>
               </div>
 
               <div>
