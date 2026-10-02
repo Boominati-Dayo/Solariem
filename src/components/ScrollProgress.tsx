@@ -1,6 +1,31 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+
+/**
+ * Subscribe to `prefers-reduced-motion`.
+ *
+ * This is an external system, so it is subscribed to rather than sampled into
+ * component state from inside an effect. Sampling it in an effect and calling
+ * setState from there is the cascading render `useSyncExternalStore` exists to
+ * avoid, and it also gets the live-update case free: a reader who turns
+ * reduced motion on mid-page gets the pin removed without a reload.
+ */
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia(REDUCED_MOTION);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+}
+
+/** Server render assumes motion is wanted; the client corrects it on hydrate. */
+const reducedMotionServer = () => false;
+const reducedMotionClient = () => window.matchMedia(REDUCED_MOTION).matches;
+
+function usePrefersReducedMotion() {
+  return useSyncExternalStore(subscribeReducedMotion, reducedMotionClient, reducedMotionServer);
+}
 
 export type ProgressStep = {
   /** 0..1 — the point in the pinned run at which this layer becomes visible. */
@@ -50,7 +75,9 @@ export type ProgressStep = {
  * gets stranded under a fixed overlay for someone tabbing through it. The
  * reduced-motion case renders the layers at full strength as a normal static
  * block, so the content is fully readable and nothing is hidden. See
- * `.scroll-progress` in globals.css, which holds the clamp.
+ * `.scroll-progress` in globals.css, which holds the clamp. The query is
+ * subscribed to rather than read once, so switching it on mid-page tears the
+ * scrub down without a reload.
  *
  * The step labels are rendered into a `sr-only` list rather than dropped, so the
  * sequence is available to a screen reader as an ordered list.
@@ -67,18 +94,18 @@ export default function ScrollProgress({
   panelClassName?: string;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [live, setLive] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    // Bail on reduced motion, so the effect never installs a scroll listener.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    setLive(true);
-  }, []);
-
-  useEffect(() => {
-    if (!live) return;
+    if (reducedMotion) return;
     const el = wrapRef.current;
     if (!el) return;
+
+    // Re-checked inside the effect as well as via the subscription. On the very
+    // first hydration pass React may run effects using the server snapshot
+    // before it has re-read the store, and a reader who has reduced motion on
+    // should never get a scroll listener installed, even for one frame.
+    if (window.matchMedia(REDUCED_MOTION).matches) return;
 
     let frame = 0;
     const measure = () => {
@@ -101,7 +128,7 @@ export default function ScrollProgress({
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [live]);
+  }, [reducedMotion]);
 
   const ordered = [...steps].sort((a, b) => a.at - b.at);
 

@@ -20,6 +20,22 @@ module.exports = {
 		"./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
 		"./src/components/**/*.{js,ts,jsx,tsx,mdx}",
 		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+		/* src/lib holds markup-bearing strings, not just copy.
+		 *
+		 * src/lib/cardGrid.ts returns Tailwind class names and they were being
+		 * silently dropped: the class reached the HTML and resolved to no rule
+		 * at all, so a card spanning two columns lost its reading-measure cap
+		 * and ran a ~900px line. Nothing errored - the class was in the markup,
+		 * just not in the stylesheet.
+		 *
+		 * Adding a glob can only ever generate MORE css (unused rules are still
+		 * purged), so the cost of this line being wrong is nil and the cost of
+		 * it being absent is a silent visual bug.
+		 *
+		 * And do not write those class names as a template literal. Tailwind scans
+		 * source text and cannot evaluate an interpolated name, so anything built
+		 * at runtime is never generated. Every class has to be written out. */
+		"./src/lib/**/*.{js,ts,jsx,tsx}",
 	],
 	theme: {
 		extend: {

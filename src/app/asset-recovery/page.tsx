@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { FAQS, FEES, TIMELINE } from '@/lib/site';
+import { FAQS, TIMELINE, RECOVERY_FEES } from '@/lib/site';
+import { Check, X } from 'lucide-react';
 import CardRail from '@/components/CardRail';
+import { lastCardSpan } from '@/lib/cardGrid';
 import PhotoBackdrop from '@/components/PhotoBackdrop';
 import ScrollProgress from '@/components/ScrollProgress';
 import FraudInvestigationImg from '@/assets/images_for_pages/financialfraudinvestigation.png';
@@ -42,6 +44,16 @@ const AGAINST_US = [
   'We will not stop you from speaking to your own lawyer, your bank, or your family.',
 ];
 
+/**
+ * Both lists have an odd number of cards, and both sit in grids that divide
+ * evenly by two but not by three, so the last card sits alone in a row with the
+ * hairline rules running past it. `lastCardSpan` works out how far it has to
+ * reach; see src/lib/cardGrid.ts for why that is arithmetic in JS rather than a
+ * CSS selector. DOCS is a rail below `lg`, where one scrolling row cannot have
+ * a hole, and a three-column grid at `lg`, where it can.
+ */
+const DOCS_SPAN = lastCardSpan(DOCS.length, 3, 'lg');
+const AGAINST_US_SPAN = lastCardSpan(AGAINST_US.length, 2, 'md');
 export default function AssetRecoveryPage() {
   return (
     <main id="main">
@@ -91,18 +103,12 @@ export default function AssetRecoveryPage() {
                   <h2 className="text-body-sm font-medium text-foreground">The fee, in full</h2>
                 </div>
                 <dl className="divide-y divide-border">
-                  <div className="px-6 py-5">
-                    <dt className="text-caption text-muted-foreground">To open a case</dt>
-                    <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
-                  </div>
-                  <div className="px-6 py-5">
-                    <dt className="text-caption text-muted-foreground">If funds are returned</dt>
-                    <dd className="mt-1 text-h3 text-foreground">{FEES.successRate}</dd>
-                  </div>
-                  <div className="px-6 py-5">
-                    <dt className="text-caption text-muted-foreground">If nothing is returned</dt>
-                    <dd className="mt-1 text-h3 text-foreground">No success fee</dd>
-                  </div>
+                  {RECOVERY_FEES.map((f) => (
+                    <div key={f.label} className="px-6 py-5">
+                      <dt className="text-caption text-muted-foreground">{f.label}</dt>
+                      <dd className="mt-1 text-h3 tabular-nums text-foreground">{f.amount}</dd>
+                    </div>
+                  ))}
                 </dl>
                 <p className="border-t border-border px-6 py-5 text-caption text-muted-foreground">
                   The percentage is agreed in writing before the case starts and does not change
@@ -149,7 +155,7 @@ export default function AssetRecoveryPage() {
         ]}
         className="border-y border-border"
       >
-        <div className="mx-auto flex h-full max-w-container flex-col justify-center px-5 py-20 sm:px-8 lg:py-28">
+        <div className="mx-auto flex max-w-container flex-col justify-center px-5 py-16 sm:px-8 lg:h-full lg:py-28 lg:[justify-content:safe_center]">
           <header className="section-head max-w-measure">
             <h2 className="text-h2 text-foreground">How the work actually goes.</h2>
             <p className="mt-5 text-lead text-sp-body">
@@ -158,7 +164,20 @@ export default function AssetRecoveryPage() {
             </p>
           </header>
 
-          <ol className="mt-12 grid max-w-4xl grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Below `lg` the panel is static and auto-height (see
+              `.scroll-progress` in globals.css for why it cannot be pinned on a
+              phone), so the cards stack and run the full width of the section.
+              `lg:h-full` and the safe centring above only take effect once the
+              panel actually has a fixed height to centre inside.
+
+              The old `max-w-4xl` is gone. It capped five columns at 896px —
+              153px each, which wraps the longest step body into about eight
+              lines — while leaving 240px of empty space to the right, because
+              nothing centred it. The full container gives 201px per column, so
+              the same text runs to four or five lines and the panel is ~75px
+              shorter, which is the difference between fitting in 100svh on a
+              laptop and needing the overflow fallback. */}
+          <ol className="mt-12 grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-5">
             {TIMELINE.map((t, i) => (
               <li key={t.step} className="flex flex-col">
                 <span
@@ -194,7 +213,7 @@ export default function AssetRecoveryPage() {
           </header>
           <CardRail label="Documents to send us" columns={3} className="mt-14">
             {DOCS.map((d, i) => (
-              <li key={d} className="flex flex-col">
+              <li key={d} className={`flex flex-col ${DOCS_SPAN}`}>
                 <span className="card-index" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
@@ -235,9 +254,9 @@ export default function AssetRecoveryPage() {
               <li key={n} className="flex">
                 <span
                   aria-hidden="true"
-                  className="mt-[0.3rem] mr-4 inline-flex h-5 w-5 shrink-0 items-center justify-center border border-border text-[0.6rem] leading-none text-muted-foreground"
+                  className="mt-0.5 mr-4 inline-flex h-6 w-6 shrink-0 items-center justify-center border border-border text-muted-foreground"
                 >
-                  &times;
+                  <X className="h-3.5 w-3.5" strokeWidth={2} />
                 </span>
                 <p className="text-body text-muted-foreground">{n}</p>
               </li>
@@ -259,15 +278,26 @@ export default function AssetRecoveryPage() {
             </header>
             {/* The FTC/SEC/CFTC/FINRA marks of a fraudulent firm. This list is
                 meant to be read against an external one, so each commitment
-                gets a card of its own rather than a row in a list. */}
+                gets a card of its own rather than a row in a list.
+
+                The tick and the cross are lucide SVG, not the &check; and
+                &times; characters this used to be. That was a real bug rather
+                than a preference: JSX decodes only the entities Babel knows
+                about, and `check` is not among them. An unknown entity is left
+                as literal text, React then escapes the ampersand, and the page
+                ships `&amp;check;` — so the browser paints the reader the
+                seven characters "&check;" inside the box. `times` IS known, so
+                the cross rendered fine, which is why it looked like one broken
+                glyph rather than a broken approach. SVG cannot get this wrong:
+                there is no entity layer to get wrong. */}
             <ul className="card-grid-2 lg:col-span-7">
               {AGAINST_US.map((a) => (
-                <li key={a} className="flex">
+                <li key={a} className={`flex ${AGAINST_US_SPAN}`}>
                   <span
                     aria-hidden="true"
-                    className="mt-[0.15rem] mr-4 inline-flex h-5 w-5 shrink-0 items-center justify-center border border-accent/40 text-[0.7rem] leading-none text-accent"
+                    className="mt-0.5 mr-4 inline-flex h-6 w-6 shrink-0 items-center justify-center border border-accent/40 text-accent"
                   >
-                    &check;
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
                   </span>
                   <p className="text-body text-foreground">{a}</p>
                 </li>

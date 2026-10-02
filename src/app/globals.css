@@ -429,6 +429,15 @@
       border-accent px-1 font-mono text-data tabular-nums text-muted-foreground;
   }
 
+  /* NOTE ON EMPTY CELLS. A grid of N cards in C columns leaves a hole whenever N
+     does not divide by C, and in a `gap-px border bg-border` block the hairline
+     rules run straight across the hole, so it reads as a table with a blank
+     square in it. There used to be a `.card-fill-last` rule here that spanned
+     the last odd card. It was removed because CSS cannot do modulo: it made a
+     3-card list in a 3-column grid span its own last card, which is the one
+     case that was already correct. The span is now computed from the actual
+     count by `lastCardSpan` in src/lib/cardGrid.ts, which can. */
+
   /* --- card rail ----------------------------------------------------------
      Drives <CardRail>. A horizontal scroller below `lg` that becomes an
      ordinary grid at `lg` and above, from the same markup and with no
@@ -581,19 +590,35 @@
      --progress is written, so nothing is painted before the script runs and a
      no-JS reader sees the panel's own background rather than a fully-painted
      panel with the transition silently missing. */
+  /* BELOW `lg` THIS IS AN ORDINARY SECTION, AND THAT IS THE BUG FIX.
+
+     The pinned scrub was written desktop-only in spirit but shipped
+     unconditional, so on a phone it pinned a 100svh panel containing five
+     stacked cards. That content is roughly 1200px tall: the panel could not
+     grow, `overflow: hidden` made the overflow unreachable, and `justify-center`
+     pushed it out of BOTH ends at once. The result was the first card cut in
+     half, the other four invisible, and a background that never appeared to
+     change — the reader never got far enough down the run for the ramp to do
+     anything. That is a worse failure than having no effect, because the
+     section looks like it is working.
+
+     The honest fix is not to make the content fit. Five cards at phone width
+     cannot fit in one viewport, and shrinking them until they do would produce
+     a panel of unreadable stubs. It is to not pin at all: below `lg` the section
+     is static, all five layers are shown at full strength, and the ramp is
+     simply present rather than scrubbed. A pinned panel whose content exceeds
+     the viewport is a category error — pinning assumes the panel is a window
+     onto content that stays put, and this content does not stay put.
+
+     Every layer at full strength composites to the same thing the scrub ends
+     on, which is progress = 1 — a state `audit-scroll-progress.mjs` already
+     evaluates. So the phone rendering is covered by the same contrast gate as
+     the desktop one; it is not an unmeasured path. */
   .scroll-progress {
-    /* The scroll distance the section occupies. The panel pins for all of it,
-       so this is effectively "how long does the reader stay pinned". */
-    --sp-distance: 180vh;
     position: relative;
-    height: var(--sp-distance);
   }
   .scroll-progress-panel {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100svh; /* mobile browser chrome collapsing during scroll */
-    overflow: hidden;
+    position: relative;
     background-color: hsl(var(--background));
   }
   .sp-layer {
@@ -602,6 +627,39 @@
     opacity: clamp(0, calc((var(--progress, 0) - var(--at, 0)) * 40 * var(--strength, 1)), 1);
     /* No transition: the value is already scrubbed frame by frame, and easing
        it here would make it lag the scroll position. */
+  }
+  /* Because the panel is not pinned below `lg`, --progress still climbs as the
+     reader scrolls past, and leaving the clamp in place would mean the tint
+     appears only once the section is almost reached and then freezes at full.
+     That reads as a flash of untinted panel followed by a sudden tint. Below
+     `lg` every layer is simply on. The two queries are mutually exclusive, so
+     declaration order between them does not matter. */
+  @media (max-width: 1023px) {
+    .sp-layer {
+      opacity: 1;
+    }
+  }
+  @media (min-width: 1024px) {
+    .scroll-progress {
+      /* The scroll distance the section occupies. The panel pins for all of it,
+         so this is effectively "how long does the reader stay pinned". */
+      --sp-distance: 180vh;
+      height: var(--sp-distance);
+    }
+    .scroll-progress-panel {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      height: 100svh; /* mobile browser chrome collapsing during scroll */
+      /* `auto`, not `hidden`. In the normal case there is nothing to scroll so
+         no scrollbar appears and this is indistinguishable from hidden; on a
+         short viewport — a laptop at 1280x600, or any screen where the browser
+         chrome eats a third of the height — the panel content exceeds 100svh,
+         and `hidden` would strand it with no way to reach it. A panel you
+         cannot scroll to the bottom of is worse than a visible scrollbar. */
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
   }
 
   /* Body copy inside a scroll-scrubbed section. Use this INSTEAD of

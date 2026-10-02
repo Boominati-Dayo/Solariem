@@ -18,8 +18,19 @@ const CONTROLS = [
     body: 'Staff see a client record only when the case requires it, and every access is written to an audit log. Access is reviewed on a schedule and revoked when it is no longer needed.',
   },
   {
-    title: 'We hold no regulator affiliations',
-    body: 'Solariem is not affiliated with any regulator, police force, or government body, and is not authorised or regulated as a bank. We will never tell you we have special access to any of them, because no legitimate firm does.',
+    /* The second half of this used to read "and is not authorised or regulated
+       as a bank". The owner confirmed on 2026-10-02 that Solariem is a bank
+       that also does recovery work, so that sentence was false — and false in
+       the one place a fraud victim is most likely to check, on a page whose
+       entire job is to be checked.
+
+       What survives is the part that is genuinely true and genuinely useful:
+       no special access to anyone. That is not a euphemism for "not a bank", it
+       is the actual warning — a firm telling a scam victim it can walk into a
+       bank's systems is lying regardless of what it is. See the rule in
+       site.ts about never stating a regulatory status in either direction. */
+    title: 'We have no special access to anyone',
+    body: 'Solariem is a bank that also pursues recovery claims. We are not affiliated with any police force or government body, and we will never tell you we have special access to a regulator, a court, or another bank, because no legitimate firm does. If anyone tells you that about us, they are describing a different company.',
   },
   {
     title: 'Complaints go to an ombudsman, not to us alone',

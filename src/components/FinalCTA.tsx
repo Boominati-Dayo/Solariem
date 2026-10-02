@@ -1,5 +1,17 @@
 import Link from 'next/link';
-import { ORG, FEES } from '@/lib/site';
+import { ORG, ACCOUNT_FEES, RECOVERY_FEES } from '@/lib/site';
+
+/**
+ * What the homepage panel shows: one row from each schedule.
+ *
+ * The homepage has to cover both businesses, so it needs an account fee and a
+ * recovery fee side by side. Taking the *first* row of each list rather than
+ * writing new ones keeps the homepage inside the same source of truth — if
+ * "To open an account" is renamed or repriced in site.ts, the homepage follows.
+ * A hand-written homepage copy of these numbers is precisely how the three
+ * surfaces drifted apart in the first place.
+ */
+const HERO_PANEL_FEES = [...ACCOUNT_FEES.slice(0, 1), ...RECOVERY_FEES.slice(0, 3)];
 
 /** The one place on the homepage allowed a full-bleed accent panel. */
 export default function FinalCTA() {
@@ -38,24 +50,12 @@ export default function FinalCTA() {
 
             <div className="lg:col-span-5">
               <dl className="border-t border-background/20">
-                <div className="border-b border-background/20 py-5">
-                  <dt className="text-caption text-background/50">To open an account</dt>
-                  <dd className="mt-1 text-body text-gold-bright">Nothing.</dd>
-                </div>
-                <div className="border-b border-background/20 py-5">
-                  <dt className="text-caption text-background/50">To start a recovery case</dt>
-                  <dd className="mt-1 text-body text-gold-bright">Nothing.</dd>
-                </div>
-                <div className="border-b border-background/20 py-5">
-                  <dt className="text-caption text-background/50">If funds are returned</dt>
-                  <dd className="mt-1 text-body text-gold-bright">
-                    {FEES.successRate} of the amount that reached you.
-                  </dd>
-                </div>
-                <div className="border-b border-background/20 py-5">
-                  <dt className="text-caption text-background/50">If nothing is returned</dt>
-                  <dd className="mt-1 text-body text-gold-bright">No success fee is due.</dd>
-                </div>
+                {HERO_PANEL_FEES.map((f) => (
+                  <div key={f.label} className="border-b border-background/20 py-5">
+                    <dt className="text-caption text-background/50">{f.label}</dt>
+                    <dd className="mt-1 text-body tabular-nums text-gold-bright">{f.amount}</dd>
+                  </div>
+                ))}
                 <div className="py-5">
                   <dt className="text-caption text-background/50">Ask us</dt>
                   <dd className="mt-1 text-body">

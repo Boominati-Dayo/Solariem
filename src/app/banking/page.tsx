@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { FAQS, FEES, ORG } from '@/lib/site';
+import { FAQS, FEES, ORG, ACCOUNT_FEES, FEE_CURRENCY_NOTE } from '@/lib/site';
 import CardRail from '@/components/CardRail';
+import { lastCardSpan } from '@/lib/cardGrid';
 
 export const metadata: Metadata = {
   title: 'Hold money in several currencies',
@@ -48,6 +49,15 @@ const FEATURES = [
     body: 'There is no monthly balance requirement and no fee for keeping an account open. You are charged for the transfers you make, at the rate shown before you confirm.',
   },
 ];
+/**
+ * Five feature cards in .card-grid, which is two-up at sm and three-up at
+ * lg. Five leaves a hole at BOTH breakpoints — alone in a row of two, then
+ * two of three — and the two holes happen to want the same span, so the classes
+ * concatenate. Computed rather than written out: if a sixth feature is added,
+ * the row fills itself and this returns nothing at all.
+ */
+const FEATURES_SPAN =
+  lastCardSpan(FEATURES.length, 2, 'sm') + ' ' + lastCardSpan(FEATURES.length, 3, 'lg');
 
 const STEPS = [
   { title: 'Apply', body: 'Email, phone, and a document to confirm your identity. It takes about ten minutes.' },
@@ -93,19 +103,18 @@ export default function BankingPage() {
               </div>
             </div>
             <div className="lg:col-span-5">
+              {/* Mapped from ACCOUNT_FEES rather than written out here. This
+                  panel used to say "Nothing" four times, which is both less
+                  useful than a figure and impossible to keep in step with the
+                  "What it costs" table further down the same page. Now there is
+                  one price list in site.ts and both read from it. */}
               <dl className="divide-y divide-border border-y border-border">
-                <div className="py-5">
-                  <dt className="text-caption text-muted-foreground">To open an account</dt>
-                  <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
-                </div>
-                <div className="py-5">
-                  <dt className="text-caption text-muted-foreground">Monthly minimum</dt>
-                  <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
-                </div>
-                <div className="py-5">
-                  <dt className="text-caption text-muted-foreground">To keep it open</dt>
-                  <dd className="mt-1 text-h3 text-foreground">Nothing</dd>
-                </div>
+                {ACCOUNT_FEES.slice(0, 3).map((f) => (
+                  <div key={f.label} className="py-5">
+                    <dt className="text-caption text-muted-foreground">{f.label}</dt>
+                    <dd className="mt-1 text-h3 tabular-nums text-foreground">{f.amount}</dd>
+                  </div>
+                ))}
                 <div className="py-5">
                   <dt className="text-caption text-muted-foreground">Deposit guarantee</dt>
                   <dd className="mt-1 text-body text-foreground">
@@ -113,6 +122,9 @@ export default function BankingPage() {
                   </dd>
                 </div>
               </dl>
+              <p className="mt-4 text-caption text-muted-foreground">
+                Sending and converting are charged. The full schedule is below.
+              </p>
             </div>
           </div>
         </div>
@@ -159,7 +171,7 @@ export default function BankingPage() {
               readable measure rather than a full-width line of text. */}
           <ul className="card-grid mt-16">
             {FEATURES.map((f) => (
-              <li key={f.title}>
+              <li key={f.title} className={FEATURES_SPAN}>
                 <h3 className="text-h4 text-foreground">{f.title}</h3>
                 <p className="mt-3 text-body text-muted-foreground">{f.body}</p>
               </li>
@@ -210,21 +222,21 @@ export default function BankingPage() {
               <p className="mt-5 text-lead text-muted-foreground">{FEES.statement}</p>
             </header>
             <div className="lg:col-span-7">
+              {/* The full schedule, from the same ACCOUNT_FEES the hero panel
+                  reads. The three hand-written rows this replaces said "No
+                  charge" for sending money, which is the one thing on this page
+                  that was both wrong and costly to be wrong about: a customer
+                  who discovers a £6 wire fee at the point of sending has already
+                  trusted you with the transfer. */}
               <dl className="divide-y divide-border border-y border-border">
-                <div className="grid grid-cols-1 gap-1 py-6 md:grid-cols-12 md:gap-6">
-                  <dt className="text-body font-medium text-foreground md:col-span-7">
-                    Opening or keeping an account
-                  </dt>
-                  <dd className="text-body text-muted-foreground md:col-span-5">No charge.</dd>
-                </div>
-                <div className="grid grid-cols-1 gap-1 py-6 md:grid-cols-12 md:gap-6">
-                  <dt className="text-body font-medium text-foreground md:col-span-7">
-                    A transfer between currencies
-                  </dt>
-                  <dd className="text-body text-muted-foreground md:col-span-5">
-                    The rate and the fee are both shown before you confirm.
-                  </dd>
-                </div>
+                {ACCOUNT_FEES.map((f) => (
+                  <div key={f.label} className="grid grid-cols-1 gap-1 py-6 md:grid-cols-12 md:gap-6">
+                    <dt className="text-body font-medium text-foreground md:col-span-7">{f.label}</dt>
+                    <dd className="text-body tabular-nums text-muted-foreground md:col-span-5">
+                      {f.amount}
+                    </dd>
+                  </div>
+                ))}
                 <div className="grid grid-cols-1 gap-1 py-6 md:grid-cols-12 md:gap-6">
                   <dt className="text-body font-medium text-foreground md:col-span-7">
                     A recovery case, if you use one
@@ -235,6 +247,7 @@ export default function BankingPage() {
                   </dd>
                 </div>
               </dl>
+              <p className="mt-5 text-caption text-muted-foreground">{FEE_CURRENCY_NOTE}</p>
             </div>
           </div>
         </div>

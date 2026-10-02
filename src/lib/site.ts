@@ -1,20 +1,26 @@
 /**
  * SOLARIEM — single source of truth for brand constants and copy.
  *
- * Compliance note: we HOLD CUSTOMER MONEY. Money recovered on a case is
- * credited to the account it belongs to, and accounts hold balances customers
- * can withdraw from. So the business takes money in and holds it — describe it
- * that way. An earlier version of this file said "Solariem is NOT a bank and is
- * not authorised to take deposits", which was simply false, and false in the
- * one place a fraud victim is most likely to check.
+ * Compliance note: we HOLD CUSTOMER MONEY, and we ARE A BANK. Money recovered
+ * on a case is credited to the account it belongs to, accounts hold balances
+ * customers can withdraw from, and the owner confirmed on 2026-10-02 that
+ * Solariem is a bank which also does asset recovery — not an "account
+ * provider that is careful about the word bank". An earlier version of this
+ * file said "Solariem is NOT a bank and is not authorised to take deposits".
+ * That was false, and false in the one place a fraud victim is most likely to
+ * check. Do not reintroduce it. Say what the business is.
  *
  * Two rules follow from that:
  *
- * 1. NEVER state an authorisation status in either direction. Do not write
- *    "regulated", "FCA authorised", "licensed", "an e-money institution", and
- *    do not write "not regulated" or "not authorised to take deposits" either.
- *    We do not publish a regulatory claim until the exact permission and its
- *    regulator are confirmed in writing. Silence is honest; a guess is not.
+ * 1. Being a bank does NOT license a regulatory claim. Do not write "FCA
+ *    authorised", "PRA regulated", "licensed", "an e-money institution", "FSCS
+ *    member", or invent a register number — and equally, do not write "not
+ *    regulated" or "not authorised to take deposits". We publish no regulatory
+ *    status until the exact permission and its regulator are confirmed in
+ *    writing. Silence is honest; a guess is not. This is why
+ *    SecurityCompliance.tsx says "we have no special access to anyone" rather
+ *    than denying being a bank: the first is a true and useful warning, the
+ *    second was the thing that had to go.
  *
  * 2. Still never describe the service as "guaranteed", "insured", "risk-free"
  *    or "protected", and never claim a regulator or law-enforcement
@@ -22,10 +28,18 @@
  *    use to warn people about fraudulent recovery firms, and a recovery firm
  *    that makes one loses the argument on every honest page it has.
  *
- * The FSCS line ("money held with us is not covered by any deposit guarantee
- * scheme") is kept even though it is a claim about protection, because it is
- * the conservative direction and removing a consumer warning is worse than
- * any wording gain. Confirm it against the account agreement before launch.
+ * OPEN AND NEEDING AN ANSWER FROM THE OWNER: the FSCS / deposit-guarantee
+ * wording. Roughly a dozen places say money held with us is not covered by any
+ * deposit guarantee scheme. That was written as the conservative direction
+ * while the business was described as not a bank. Now that it IS a bank, the
+ * statement may be the opposite of the truth — a UK bank's eligible deposits
+ * are normally inside the FSCS up to the published limit. Do not "fix" this by
+ * asserting protection either: if we are not a member, claiming cover is a
+ * serious misrepresentation, and we do not know which we are. Until the owner
+ * confirms the membership position and the applicable limit, the existing
+ * conservative wording stays. It is the only claim in this file that is
+ * knowingly out of step with the rest, and it is flagged in
+ * docs/launch-blockers.md rather than silently resolved.
  *
  * ON FEES — read before editing FEES or the fee copy.
  * The success fee statement below is accurate: it is charged only on money
@@ -196,6 +210,75 @@ export const FEES = {
     '15–25% of the amount that actually reached you, at the rate agreed in writing before the case begins. If nothing is returned, no success fee is due. ' +
     'The only other charges that can arise are account-level ones — for example, clearing a restriction on an account held for verification — and those are shown to you in the app with the amount before you authorise them.',
 } as const;
+
+/* ------------------------------------------------------------------ */
+/* The fee SCHEDULE, in one place                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Account pricing and recovery pricing, as data rather than as hand-written
+ * rows in each page.
+ *
+ * WHY THIS EXISTS. Four surfaces used to state these numbers independently: the
+ * /banking hero panel, the /banking "What it costs" table, the /asset-recovery
+ * hero panel, and the FinalCTA panel on the homepage. They drifted - one page
+ * said "Nothing", another "No charge", a third "Free", for what was meant to be
+ * the same fact. "Keep them consistent across the pages" cannot be honoured by
+ * four independent copies of a price list, so there is one list now and every
+ * surface maps over it.
+ *
+ * `Free` and `£0` are deliberately not the same string, because they are not
+ * the same claim. "£0" is a specific number for the specific thing being asked
+ * about (a monthly minimum, a keeping-open charge). "Free" is used where the
+ * whole action costs nothing. Collapsing them into one word loses exactly the
+ * distinction the reader is checking for.
+ *
+ * THESE ARE PLACEHOLDERS AND MUST BE CONFIRMED BY THE OWNER BEFORE LAUNCH.
+ * They are modelled on a plausible GBP-denominated multi-currency account, and
+ * they are the sort of figure a customer will hold us to. If one is wrong, fix
+ * it here and every page corrects itself - which is the entire point.
+ *
+ * The account holds several currencies, so GBP is stated as the base and the
+ * per-currency equivalent is shown in the app before a transfer is confirmed.
+ */
+export const ACCOUNT_FEES: { label: string; amount: string }[] = [
+  { label: 'To open an account', amount: 'Free' },
+  { label: 'Monthly minimum', amount: '£0' },
+  { label: 'To keep it open', amount: '£0' },
+  { label: 'Money coming in', amount: 'Free' },
+  { label: 'Sending within the UK and the EU', amount: 'Free' },
+  { label: 'Sending outside those, per transfer', amount: '£6' },
+  { label: 'Converting between currencies', amount: '0.4% of the amount' },
+];
+
+/**
+ * Recovery-case pricing, kept apart from ACCOUNT_FEES because the two are a
+ * different kind of contract: one is the schedule for holding money, the other
+ * is a contingent percentage on an outcome. Merged into a single list, a "free
+ * to open" row would sit next to a "15-25%" row and imply they are the same
+ * kind of charge.
+ *
+ * The success fee references `FEES.successRate` rather than repeating the
+ * string, so the one number that also appears in the legal pages cannot drift
+ * from the one that appears in the panels.
+ */
+export const RECOVERY_FEES: { label: string; amount: string }[] = [
+  { label: 'To start a case', amount: 'Free' },
+  { label: 'While the case is open', amount: '£0' },
+  {
+    label: 'If funds come back to you',
+    amount: FEES.successRate + ' of the amount that reached you',
+  },
+  { label: 'If nothing comes back to you', amount: 'No success fee is due' },
+];
+
+/**
+ * The currency the figures above are quoted in. Rendered beside any fee table,
+ * because a bare "£6" on a page about seven currencies reads as though it
+ * applies to all seven equally.
+ */
+export const FEE_CURRENCY_NOTE =
+  'Amounts are quoted in pounds sterling. What is charged in another currency is shown in the app before you confirm, together with the exchange rate.';
 
 export const TIMELINE = [
   {
