@@ -1,196 +1,215 @@
 'use client';
 
-import { useEffect, useState, Suspense, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { CheckCircle, XCircle, Loader2, Mail } from 'lucide-react';
-import { showSuccess, showError } from '@/utils/toast';
+import { showSuccess } from '@/utils/toast';
+import { AuthShell, AuthHeading, FormError, FormField } from '@/components/AuthForm';
 
+type Status = 'checking' | 'done' | 'failed';
+
+/**
+ * Land here from the verification email and the address gets confirmed.
+ *
+ * THE NAVIGATION IS A FULL PAGE LOAD ON PURPOSE. A soft `router.push` can leave
+ * a cached user profile in memory, and the dashboard then re-renders the "verify
+ * your email" banner against an address that is already verified. `window.location`
+ * forces `/me` to run again and read the real state.
+ *
+ * What changed is the eight-second timer. The page used to navigate away on its
+ * own a moment after verifying, which meant the confirmation was never actually
+ * read by anyone using a screen reader, and by anyone who simply looked away.
+ * The button does the same navigation; it just waits to be asked.
+ */
 function VerifyEmailForm() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const searchParams = useSearchParams();
+  const { verifyEmail } = useAuth();
+
+  const [status, setStatus] = useState<Status>('checking');
   const [message, setMessage] = useState('');
   const [resendEmail, setResendEmail] = useState('');
   const [resending, setResending] = useState(false);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const { verifyEmail } = useAuth();
-
-  const verificationStarted = useRef(false);
+  const [resendError, setResendError] = useState<string | null>(null);
+  const started = useRef(false);
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const token = searchParams.get('token');
 
     if (!token) {
-      setStatus('error');
-      setMessage('No verification token provided. Enter your email below to receive a new link.');
+      setStatus('failed');
+      setMessage('That link is missing its code, so there was nothing to check. Enter your address below and we will send a new one.');
       return;
     }
 
-    if (verificationStarted.current) return;
-    verificationStarted.current = true;
+    if (started.current) return;
+    started.current = true;
 
-    const handleVerification = async () => {
+    (async () => {
       try {
-        const success = await verifyEmail(token);
-        if (success) {
-          setStatus('success');
-          setMessage('Email verified successfully! You can now access all features.');
-          // Hard navigation so the dashboard re-runs /me and re-reads the
-          // fresh emailVerified state. A soft router.push() can keep a
-          // stale userProfile cached in memory and re-trigger the
-          // "Email Verification Required" banner.
-          const target = new URL(window.location.href);
-          target.pathname = '/dashboard';
-          target.search = '?verified=1';
-          target.hash = '';
-          // Defer slightly so the user can read the success message.
-          setTimeout(() => {
-            window.location.replace(target.toString());
-          }, 800);
+        const ok = await verifyEmail(token);
+        if (ok) {
+          setStatus('done');
+          setMessage('Your address is confirmed.');
         } else {
-          setStatus('error');
-          setMessage('This verification link is invalid or has expired. Enter your email below to receive a new one.');
+          setStatus('failed');
+          setMessage('That link is no longer valid. Enter your address below and we will send a new one.');
         }
-      } catch (error) {
-        setStatus('error');
-        setMessage('An error occurred during email verification. Enter your email below to receive a new link.');
+      } catch {
+        setStatus('failed');
+        setMessage('We could not check that link just now. Enter your address below and we will send a new one.');
       }
-    };
+    })();
+  }, [searchParams, verifyEmail]);
 
-    handleVerification();
-  }, [searchParams, verifyEmail, router]);
+  /** Full load on purpose — see the note at the top of this file. */
+  function goToDashboard() {
+    const target = new URL(window.location.href);
+    target.pathname = '/dashboard';
+    target.search = '?verified=1';
+    target.hash = '';
+    window.location.replace(target.toString());
+  }
 
-  const handleResend = async () => {
-    if (!resendEmail) {
-      showError('Please enter your email address');
+  async function handleResend(e: React.FormEvent) {
+    e.preventDefault();
+    if (resending) return;
+
+    if (!resendEmail.trim()) {
+      setResendError('Enter the email address on your account.');
+      setTimeout(() => errorRef.current?.focus(), 50);
       return;
     }
+
     setResending(true);
+    setResendError(null);
     try {
       const response = await fetch('/api/auth/send-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resendEmail }),
+        body: JSON.stringify({ email: resendEmail.trim() }),
       });
-      let result: { error?: string; message?: string; success?: boolean } = {};
-      try {
-        result = await response.json();
-      } catch {
-        // Non-JSON response (e.g. HTML error page) — treat as generic failure
-      }
+      // A non-JSON body (an error page, say) must not throw past the catch and
+      // be reported as a network failure, which would be a lie.
+      const result: { error?: string; message?: string } = await response
+        .json()
+        .catch(() => ({}));
+
       if (response.ok) {
-        showSuccess('A new verification email has been sent. Check your inbox.');
+        showSuccess('A new verification email is on its way. Check your inbox.');
       } else if (response.status === 404) {
-        showError('No account found with that email address.');
-      } else if (response.status === 200 && result.message?.toLowerCase().includes('already verified')) {
-        showSuccess('This email is already verified. You can log in.');
+        setResendError('No account is using that address.');
+        setTimeout(() => errorRef.current?.focus(), 50);
+      } else if (result.message?.toLowerCase().includes('already verified')) {
+        showSuccess('That address is already verified. You can sign in.');
       } else {
-        showError(result.error || 'Failed to send verification email');
+        setResendError(result.error || 'We could not send that email. Try again in a moment.');
+        setTimeout(() => errorRef.current?.focus(), 50);
       }
     } catch {
-      showError('Failed to send verification email');
+      setResendError('We could not reach the server. Try again in a moment.');
+      setTimeout(() => errorRef.current?.focus(), 50);
     } finally {
       setResending(false);
     }
-  };
+  }
+
+  if (status === 'checking') {
+    return (
+      <AuthShell>
+        <AuthHeading title="Checking your address" intro="One moment while we confirm that link." />
+      </AuthShell>
+    );
+  }
+
+  if (status === 'done') {
+    return (
+      <AuthShell
+        aside={
+          <div className="border border-border bg-muted p-6 lg:p-8">
+            <h2 className="text-h3 font-normal text-foreground">What is now unlocked</h2>
+            <ul className="mt-6 space-y-3 text-body-sm text-muted-foreground">
+              <li className="border-l border-border pl-4">
+                Sending and receiving payments from your account.
+              </li>
+              <li className="border-l border-border pl-4">
+                Opening a recovery case, and following where it gets to.
+              </li>
+            </ul>
+          </div>
+        }
+      >
+        <AuthHeading title="Address confirmed" intro={message} />
+        <div className="mt-8 flex max-w-measure flex-wrap items-center gap-3">
+          <button type="button" onClick={goToDashboard} className="btn-ink">
+            Go to your account
+          </button>
+        </div>
+      </AuthShell>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Email Verification
-          </h2>
+    <AuthShell
+      aside={
+        <div className="border border-border bg-muted p-6 lg:p-8">
+          <h2 className="text-h3 font-normal text-foreground">Check the address bar first.</h2>
+          <p className="mt-4 max-w-measure text-body-sm text-muted-foreground">
+            We will never ring you or message you to ask you to confirm an address, and we will
+            never ask for a code from your phone to get into your account. If a page asking for that
+            got you here, close it and come to the site yourself.
+          </p>
+          <Link href="/blog" className="btn-line mt-7">
+            How these scams work
+          </Link>
         </div>
-      </div>
+      }
+    >
+      <AuthHeading title="We could not confirm that address" intro={message} />
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <div className="text-center">
-            {status === 'loading' && (
-              <div className="space-y-4">
-                <Loader2 className="mx-auto h-12 w-12 text-navy-600 animate-spin" />
-                <p className="text-gray-600">Verifying your email address...</p>
-              </div>
-            )}
+      <form onSubmit={handleResend} noValidate className="mt-9 max-w-measure">
+        <FormField
+          id="resend-email"
+          label="Email address"
+          hint="We will send a fresh link to whichever address is on the account."
+        >
+          <input
+            id="resend-email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            className="field mt-2"
+            placeholder="you@example.com"
+            aria-invalid={resendError ? true : undefined}
+            value={resendEmail}
+            onChange={(e) => {
+              setResendEmail(e.target.value);
+              if (resendError) setResendError(null);
+            }}
+          />
+        </FormField>
 
-            {status === 'success' && (
-              <div className="space-y-4">
-                <CheckCircle className="mx-auto h-12 w-12 text-green-600" />
-                <h3 className="text-lg font-medium text-gray-900">Email Verified!</h3>
-                <p className="text-gray-600">{message}</p>
-                <p className="text-sm text-gray-500">
-                  Taking you to the dashboard...
-                </p>
-                <button
-                  onClick={() => {
-                    const target = new URL(window.location.href);
-                    target.pathname = '/dashboard';
-                    target.search = '?verified=1';
-                    target.hash = '';
-                    window.location.replace(target.toString());
-                  }}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-navy-600 hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500"
-                >
-                  Go to Dashboard
-                </button>
-              </div>
-            )}
+        {resendError ? <FormError errorRef={errorRef}>{resendError}</FormError> : null}
 
-            {status === 'error' && (
-              <div className="space-y-4">
-                <XCircle className="mx-auto h-12 w-12 text-[#0E5A50]" />
-                <h3 className="text-lg font-medium text-gray-900">Verification Failed</h3>
-                <p className="text-gray-600">{message}</p>
-                <div className="pt-2 space-y-3">
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="email"
-                      value={resendEmail}
-                      onChange={(e) => setResendEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none"
-                    />
-                  </div>
-                  <button
-                    onClick={handleResend}
-                    disabled={resending}
-                    className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-navy-600 hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500 disabled:opacity-50"
-                  >
-                    {resending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      'Send New Verification Link'
-                    )}
-                  </button>
-                </div>
-                <div className="space-y-2 pt-2">
-                  <button
-                    onClick={() => router.push('/login')}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-navy-600 hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500"
-                  >
-                    Go to Login
-                  </button>
-                  <button
-                    onClick={() => router.push('/signup')}
-                    className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E5A50]"
-                  >
-                    Create New Account
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="mt-7 flex flex-wrap items-center gap-3">
+          <button type="submit" disabled={resending} className="btn-ink disabled:opacity-50">
+            {resending ? 'Sending…' : 'Send a new link'}
+          </button>
+          <Link href="/login" className="btn-line">
+            Back to sign in
+          </Link>
         </div>
-      </div>
-    </div>
+      </form>
+    </AuthShell>
   );
 }
 
 export default function VerifyEmailPage() {
+  // Neutral skeleton, not a copy of the page — see the note in signup/page.tsx.
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="mx-auto max-w-container px-5 py-20 sm:px-8 sm:py-28" />}>
       <VerifyEmailForm />
     </Suspense>
   );

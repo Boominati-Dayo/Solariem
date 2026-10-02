@@ -76,6 +76,12 @@ interface AuthContextType {
     state?: string;
     city?: string;
     zip?: string;
+    /**
+     * Present because the register route reads it and passes it to
+     * UserService — it was missing here, so a caller passing `currency` got a
+     * type error and the account was silently created without one.
+     */
+    currency?: string;
     referralCode?: string;
   }) => Promise<boolean>;
   logout: () => Promise<void>;

@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import jwt, { TokenExpiredError, JsonWebTokenError, NotBeforeError } from 'jsonwebtoken';
 
 const RAW_SECRET = process.env.JWT_SECRET;
@@ -46,9 +47,7 @@ if (isUnusable) {
 
 // Ephemeral per-process key: nothing is shared, and it cannot outlive the
 // process. Deliberately generated rather than hardcoded.
-const JWT_SECRET = isUnusable
-  ? require('crypto').randomBytes(48).toString('hex')
-  : RAW_SECRET;
+const JWT_SECRET = isUnusable ? randomBytes(48).toString('hex') : RAW_SECRET;
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 

@@ -18,6 +18,13 @@ import { useAuth } from '@/contexts/AuthContext';
  * `login(email, password)` with no such argument, so the control did nothing
  * while appearing to offer a security choice. A checkbox that silently does
  * nothing is worse than no checkbox.
+ *
+ * It is deliberately NOT built on `AuthShell`, unlike the four sibling pages.
+ * Sign-in carries a security aside that is specific to signing in, and folding
+ * it into the shared component would mean a heading and a bullet list on every
+ * auth page to accommodate one. The outer element is a `div` rather than a
+ * `main` for the same reason as the others: `ConditionalLayout` supplies the
+ * landmark, and two nested `main`s is not a valid page.
  */
 export default function LoginPage() {
   const { login, forgotPassword, user } = useAuth();
@@ -96,7 +103,7 @@ export default function LoginPage() {
   if (user) return null;
 
   return (
-    <main id="main" className="bg-background">
+    <div id="main">
       <section className="border-b border-border">
         <div className="mx-auto max-w-container px-5 py-20 sm:px-8 sm:py-28">
           <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
@@ -319,6 +326,6 @@ export default function LoginPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

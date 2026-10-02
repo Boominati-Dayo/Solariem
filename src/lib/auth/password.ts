@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { checkPassword } from './passwordPolicy';
 
 const SALT_ROUNDS = 12;
 
@@ -10,33 +11,13 @@ export async function verifyPassword(password: string, hashedPassword: string): 
   return bcrypt.compare(password, hashedPassword);
 }
 
+/**
+ * Delegates to `passwordPolicy`. The rules live there because the signup and
+ * reset forms need to evaluate them in the browser to explain what is missing,
+ * and this module cannot be imported there without pulling bcrypt in with it.
+ */
 export function validatePassword(password: string): { isValid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
-  }
-  
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  }
-  
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-  
-  if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-  
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-    errors.push('Password must contain at least one special character');
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
+  return checkPassword(password);
 }
 
 
