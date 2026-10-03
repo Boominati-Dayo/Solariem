@@ -23,10 +23,15 @@ import SolariemExteriorImg from '@/assets/images_for_pages/solariem-exterior.png
  * mind before anyone "fixes" it. The section is taller in aspect than the
  * photo (1086x849 against 1536x1024), so `object-cover` fits the height and
  * crops the width — only the left ~15% is off-screen at `right`, and the
- * scrim only uncovers the right quarter anyway. On a phone the section is far
- * taller than the photo's aspect and the same crop rule crops hard sideways,
- * which is where `right` finally earns its keep: it keeps the visible slice on
- * the bright sky half rather than the shadowed half.
+ * scrim only uncovers the right quarter anyway.
+ *
+ * On a phone that stops being true. The section is far taller than the photo is
+ * wide there, so the crop goes hard sideways and roughly a quarter of the frame
+ * is all that survives — which makes the horizontal anchor the whole decision
+ * rather than a rounding error. `positionNarrow="30% 50%"` slides that visible
+ * slice 30% in from the left edge. At `right` it was showing the building's
+ * far edge; this keeps the middle of the facade, where the windows and the
+ * entrance are, instead of a slice of empty forecourt.
  */
 export default function BankingHero() {
   return (
@@ -35,6 +40,7 @@ export default function BankingHero() {
       scrim="left"
       photo="full"
       position="center right"
+      positionNarrow="30% 50%"
       priority
       className="border-b border-border"
     >

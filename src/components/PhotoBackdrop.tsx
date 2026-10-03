@@ -56,6 +56,7 @@ export default function PhotoBackdrop({
   className = '',
   photo = 'full',
   position = 'center',
+  positionNarrow,
   priority = false,
   scrim = 'bottom',
 }: {
@@ -66,6 +67,13 @@ export default function PhotoBackdrop({
   /** How present the photograph is. `full` lets it be the section. */
   photo?: 'full' | 'muted' | 'faint';
   position?: string;
+  /**
+   * `object-position` below `lg`, where the layout stacks. Same vocabulary as
+   * `position`. Set it whenever the wide crop shows something the narrow one
+   * should not: the same photograph needs a different horizontal anchor on a
+   * phone, because the section is far taller than the photo is wide there.
+   */
+  positionNarrow?: string;
   priority?: boolean;
   scrim?: 'bottom' | 'left';
 }) {
@@ -82,8 +90,17 @@ export default function PhotoBackdrop({
           fill
           priority={priority}
           sizes="100vw"
-          className={`object-cover ${photoOpacity}`}
-          style={{ objectPosition: position }}
+          className={`object-cover ${photoOpacity} photo-position`}
+          /* The crop VALUES travel as custom properties, but `object-position`
+             itself is left to `.photo-position` in globals.css. Setting it here
+             as well would outrank that rule — including its media query — and
+             the narrow-screen crop would silently never apply. */
+          style={
+            {
+              '--photo-position': position,
+              '--photo-position-narrow': positionNarrow,
+            } as React.CSSProperties
+          }
         />
       </div>
 

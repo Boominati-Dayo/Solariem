@@ -462,6 +462,28 @@
     filter: brightness(0) invert(1);
   }
 
+  /* Where the photograph is cropped to, and where it is cropped to on a narrow
+     screen. `object-position` is set HERE and only here — never as an inline
+     style on the image — because an inline declaration outranks every rule in
+     this file and the media query below could then never win. The values arrive
+     as custom properties from PhotoBackdrop, so the class stays static (Tailwind
+     will not compile an interpolated name) while the crop stays per-call-site.
+
+     The fallback chain matters: `--photo-position-narrow` falls back to
+     `--photo-position`, so a section that sets no narrow anchor keeps exactly
+     the crop it had before this existed, and one that sets neither falls back
+     to the CSS default of centring. */
+
+  .photo-position {
+    object-position: var(--photo-position, 50% 50%);
+  }
+
+  @media (max-width: 1023px) {
+    .photo-position {
+      object-position: var(--photo-position-narrow, var(--photo-position, 50% 50%));
+    }
+  }
+
   .card-line {
     @apply border border-border bg-card p-6 lg:p-8;
   }
