@@ -1,7 +1,6 @@
 {
-  "name": "Solariem",
+  "name": "Solariem Trust Bank",
   "short_name": "Solariem",
-  "description": "Multi-currency accounts and asset recovery.",
   "icons": [
     {
       "src": "/favicon/web-app-manifest-192x192.png",
@@ -14,16 +13,9 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/favicon/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ],
-  "theme_color": "#FAF9F6",
-  "background_color": "#14130F",
-  "display": "standalone",
-  "start_url": "/"
+  "theme_color": "#fdc301",
+  "background_color": "#e0012d",
+  "display": "standalone"
 }
