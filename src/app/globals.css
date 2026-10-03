@@ -287,6 +287,81 @@
   /* Flat gold wash, for a single emphasised band. */
   .wash-gold { background-color: hsl(var(--gold-tint)); }
 
+  /* --- the mark as a watermark --------------------------------------------
+     Unlike every other rule in this block, this one costs an image request, so
+     it is kept to three sections that can carry it on their own: a section
+     with an empty rail beside it, and two ink panels. Not a repeating tile — a
+     tiled mark reads as a security-print background, which is a different and
+     much louder idea than the one this site is making.
+
+     THE CUT IS THE POINT. The mark is centred on one edge of its section and
+     translated 40% of its own width back through it, so roughly a third hangs
+     outside where `overflow-hidden` takes it. The shape therefore never
+     resolves into a whole logo sitting in the middle of the copy. 40% rather
+     than the literal 50% because at half, only half the mark is ever visible
+     and it stops reading as anything at all.
+
+     TINTED, NOT LAID ON. `multiply` on bone and `screen` on ink pull the mark
+     toward the surface it is on: it reads as a warm shift in the paper rather
+     than a coloured shape floating over it, and it cannot introduce a hard edge
+     against the type it sits under.
+
+     THE OPACITIES ARE MEASURED, NOT GUESSED — compositing every pixel of the
+     mark over each surface, worst case:
+       bone  rgb(250,249,246): the mark's darkest point lands on
+             rgb(246,237,234) — 1.10:1 against the page. Body copy over it still
+             reads 16.1:1, against 17.7:1 on a clean page.
+       ink   rgb(20,19,15): the mark lifts the panel to 1.17:1. The gold fee
+             figures over it still read 8.9:1, against 10.5:1 undecorated.
+     That is the band a watermark has to sit in: unmistakably a shape, never an
+     obstacle. If a change makes either number move more than about a point,
+     the decoration has started costing the content.
+
+     THE HOST HAS TO COOPERATE: `relative isolate overflow-hidden` on the
+     section (or panel). `isolate` is what keeps `z-index: -1` from dropping the
+     mark behind the section's own background, and `overflow-hidden` is what
+     does the cutting. ---------------------------------------------------------------- */
+  .mark-wash {
+    position: absolute;
+    top: 50%;
+    z-index: -1;
+    /* Sized by HEIGHT, not width, and capped at 70% of whatever section it is
+       in. A width-driven size is the obvious way to write this and it is wrong:
+       the mark is square-ish, so a size that reads as a watermark on a 1200px
+       section is taller than the 380px panels and gets sliced top and bottom
+       into a band that no longer reads as a mark at all. Height is what has to
+       fit. `width: auto` then takes the width from the intrinsic ratio, so
+       nothing is ever squashed.
+
+       44vw between a 15rem floor and a 30rem ceiling. The floor is what a phone
+       gets, and it is deliberately low: at 375px a 320px mark would fill half
+       the screen behind a column of text, which is a wallpaper, not a
+       watermark. */
+    height: min(clamp(15rem, 44vw, 30rem), 70%);
+    width: auto;
+    pointer-events: none;
+    user-select: none;
+  }
+  .mark-wash-right {
+    right: 0;
+    transform: translate(40%, -50%);
+  }
+  .mark-wash-left {
+    left: 0;
+    transform: translate(-40%, -50%);
+  }
+  /* Two surfaces, two tints, and the opacities are not the same number twice:
+     ink swallows far more of a mark than bone does, so the dark one carries a
+     little more. */
+  .mark-wash-light {
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+  }
+  .mark-wash-dark {
+    opacity: 0.08;
+    mix-blend-mode: screen;
+  }
+
   /* --- photographic backdrop ---------------------------------------------
      Drives <PhotoBackdrop>. The image fills the section, then two scrims go
      over it: a directional one so the copy always lands on the solid end

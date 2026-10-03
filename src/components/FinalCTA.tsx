@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ORG, ACCOUNT_FEES, RECOVERY_FEES } from '@/lib/site';
+import MarkWatermark from '@/components/MarkWatermark';
 
 /**
  * What the homepage panel shows: one row from each schedule.
@@ -21,8 +22,10 @@ export default function FinalCTA() {
         {/* The dark panel is where the gold second voice earns its keep. Gold on
             ink is 10.98:1, so it can carry real text here in a way it never can
             on bone (3.08:1 — borders and fills only). The wash keeps the panel
-            from being a flat black rectangle. */}
-        <div className="wash-brand-dark relative border border-border bg-foreground px-6 py-14 text-background sm:px-12 lg:py-20">
+            from being a flat black rectangle, and the watermark behind the
+            heading gives the close of the page a mark of its own. */}
+        <div className="wash-brand-dark relative isolate overflow-hidden border border-border bg-foreground px-6 py-14 text-background sm:px-12 lg:py-20">
+          <MarkWatermark edge="left" surface="dark" />
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <h2 className="font-display text-display-1">Every asset, accounted for.</h2>

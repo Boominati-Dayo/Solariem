@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FAQS } from '@/lib/site';
+import MarkWatermark from '@/components/MarkWatermark';
 
 /**
  * Answer-first FAQ. Copy is phrased as the question in the H2 and opens with
@@ -12,7 +13,12 @@ export default function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="section section-rule" id="faq">
+    // `isolate overflow-hidden` are the watermark's requirements, not the
+    // section's: the left rail below this heading is empty for the height of
+    // the accordion beside it, which is the one place on the homepage with room
+    // for a mark this size.
+    <section className="section section-rule relative isolate overflow-hidden" id="faq">
+      <MarkWatermark edge="left" surface="light" />
       <div className="mx-auto max-w-container px-5 sm:px-8">
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
           <header className="section-head lg:col-span-5">

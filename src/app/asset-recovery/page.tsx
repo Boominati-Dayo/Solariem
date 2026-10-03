@@ -4,6 +4,7 @@ import { FAQS, TIMELINE, RECOVERY_FEES } from '@/lib/site';
 import { Check, X } from 'lucide-react';
 import CardRail from '@/components/CardRail';
 import { lastCardSpan } from '@/lib/cardGrid';
+import MarkWatermark from '@/components/MarkWatermark';
 import PhotoBackdrop from '@/components/PhotoBackdrop';
 import ScrollProgress from '@/components/ScrollProgress';
 import FraudInvestigationImg from '@/assets/images_for_pages/financialfraudinvestigation.png';
@@ -331,7 +332,10 @@ export default function AssetRecoveryPage() {
       {/* Closing */}
       <section className="section section-rule">
         <div className="mx-auto max-w-container px-5 sm:px-8">
-          <div className="border border-border bg-foreground px-6 py-14 text-background sm:px-12">
+          {/* The copy stops around half the panel, so the right half is empty and
+            the mark has somewhere to go that is not behind the words. */}
+        <div className="relative isolate overflow-hidden border border-border bg-foreground px-6 py-14 text-background sm:px-12">
+          <MarkWatermark edge="right" surface="dark" />
             <h2 className="font-display text-display-1">Start with the documents.</h2>
             <p className="mt-6 max-w-measure text-lead text-background/70">
               Send us what you have. You will get a plain answer on whether there is a route to
