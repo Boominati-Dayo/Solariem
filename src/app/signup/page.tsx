@@ -6,7 +6,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCurrencyForCountry, getCurrencySymbol } from '@/lib/currencies';
-import { AuthShell, AuthHeading, FormError, PasswordField } from '@/components/AuthForm';
+import {
+  AuthList,
+  AuthShell,
+  AuthHeading,
+  FormError,
+  FormField,
+  NotePanel,
+  PasswordField,
+} from '@/components/AuthForm';
 import { PASSWORD_RULES, missingHint, unmetRules } from '@/lib/auth/passwordPolicy';
 
 /**
@@ -17,8 +25,32 @@ import { PASSWORD_RULES, missingHint, unmetRules } from '@/lib/auth/passwordPoli
  * The four-step structure stayed: this form collects an unusual amount for an
  * account opening — including a transaction PIN, which has to be set before it
  * is needed — and one long page with fifteen fields is worse than four short
- * ones. What changed is that the steps now look like the sign-in form, and that
- * the promotional column is gone.
+ * ones. What changed is that every step now reads as the sign-in form: the same
+ * hairline controls, the same full-width primary button, the same plain row of
+ * secondary links underneath it, and none of the boxes.
+ *
+ * THREE THINGS WERE MAKING THIS PAGE HEAVIER THAN IT NEEDED TO BE.
+ *
+ * The step marker was a numbered list of underlined words, which is the only
+ * place on the site where text carries an underline to mark state. It is a
+ * caption and four hairlines now: the words say where you are, the rule shows
+ * it at a glance, and the rule is `aria-hidden` because it says nothing the
+ * words have not already said.
+ *
+ * THE ACCOUNT TYPES WERE A GRID OF BOXES. Eight bordered cards, each with its
+ * own description, in two columns — a shape that appears nowhere else on the
+ * site and made choosing a savings account look like a different product. They
+ * are a ruled list of radios now, which is what they always were underneath: one
+ * hairline between rows, the native radio carrying the selection, and no tick
+ * badge to keep in step with it.
+ *
+ * The primary button was sized to its label while every field above it ran the
+ * full measure, so the form had a ragged left edge and two widths of button on
+ * one page. It spans the measure like the sign-in button does, and "Back" is a
+ * text link beneath it rather than a second box beside it — which is what
+ * sign-in does with everything that is not the primary action.
+ *
+ * ALSO TRUE OF THE PREVIOUS VERSION, KEPT FOR THE RECORD.
  *
  * THAT COLUMN WAS MAKING CLAIMS. "AES-256 encryption and multi-factor
  * authentication protect your assets 24/7", "your dashboard is provisioned
@@ -58,11 +90,22 @@ type FieldKey =
 
 type Problem = { field: FieldKey; message: string };
 
+// `intro` is the sentence under the heading. It changes with the step because
+// the steps ask for unrelated things, and a heading that says "Open an account"
+// above a field asking for a country would leave the reader guessing.
 const STEPS = [
-  { n: 1, label: 'Name' },
-  { n: 2, label: 'Contact' },
-  { n: 3, label: 'Account' },
-  { n: 4, label: 'Security' },
+  {
+    n: 1,
+    label: 'Name',
+    intro: 'Four short steps. Nothing on this form takes longer than it should.',
+  },
+  { n: 2, label: 'Contact', intro: 'How we reach you, if we ever need to.' },
+  { n: 3, label: 'Account', intro: 'Pick the kind of account you are opening.' },
+  {
+    n: 4,
+    label: 'Security',
+    intro: 'The password you sign in with, and the PIN that confirms money moving.',
+  },
 ];
 
 const ACCOUNT_TYPES = [
@@ -218,154 +261,173 @@ function SignupForm() {
 
   if (user) return null;
 
-  const stepLabel = STEPS[step - 1]?.label ?? '';
+  // `step` is the number; `current` is this step's copy.
+  const current = STEPS[step - 1];
 
   return (
     <AuthShell
       aside={
-        <div className="border border-border bg-muted p-6 lg:p-8">
-          <h2 className="text-h3 font-normal text-foreground">What happens next</h2>
-          <ol className="mt-6 space-y-3 text-body-sm text-muted-foreground">
-            <li className="border-l border-border pl-4">
-              We ask for a PIN now so it is set before you need it to move money.
-            </li>
-            <li className="border-l border-border pl-4">
-              You confirm your email address from a link we send you. Nothing works until you do.
-            </li>
-            <li className="border-l border-border pl-4">
-              Then you sign in, and the account is yours to use.
-            </li>
-          </ol>
-          <p className="mt-6 max-w-measure text-body-sm text-muted-foreground">
-            We will never ask you for your password or for a code from your phone — not by phone,
-            not by email, not in a chat. If anyone does, it is not us.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/banking" className="btn-line">
-              What an account costs
-            </Link>
-            <Link href="/terms" className="btn-quiet">
-              The terms
-            </Link>
-          </div>
-        </div>
+        <NotePanel
+          heading="What happens next"
+          ordered
+          points={[
+            <>We ask for a PIN now so it is set before you need it to move money.</>,
+            <>You confirm your email address from a link we send you. Nothing works until you do.</>,
+            <>Then you sign in, and the account is yours to use.</>,
+          ]}
+          action={
+            <div className="flex flex-wrap gap-3">
+              <Link href="/banking" className="btn-line">
+                What an account costs
+              </Link>
+              <Link href="/terms" className="btn-quiet">
+                The terms
+              </Link>
+            </div>
+          }
+        >
+          We will never ask you for your password or for a code from your phone — not by phone, not
+          by email, not in a chat. If anyone does, it is not us.
+        </NotePanel>
       }
     >
       <form onSubmit={handleSubmit} noValidate>
-        <AuthHeading
-          title="Open an account"
-          intro={
-            step === 1
-              ? 'Four short steps. Nothing here takes longer than it should.'
-              : `Step ${step} of ${STEPS.length}: ${stepLabel.toLowerCase()}.`
-          }
-        />
+        <AuthHeading title="Open an account" intro={current.intro} />
 
-        <ol
-          aria-label="Progress through the form"
-          className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-caption"
-        >
-          {STEPS.map((s) => {
-            const isNow = s.n === step;
-            const isDone = s.n < step;
-            return (
-              <li
+        {/* Where you are. A caption and a hairline. The words carry the
+            information; the rule only shows it at a glance, so it is hidden from
+            assistive tech rather than announced as four empty list items. */}
+        <div className="mt-8 max-w-measure">
+          <p className="text-caption text-muted-foreground">
+            Step <span className="text-foreground">{step}</span> of {STEPS.length} —{' '}
+            {current.label.toLowerCase()}
+          </p>
+          <div aria-hidden="true" className="mt-3 flex gap-1.5">
+            {STEPS.map((s) => (
+              <span
                 key={s.n}
-                aria-current={isNow ? 'step' : undefined}
-                className={`border-b pb-1 ${
-                  isNow
-                    ? 'border-foreground text-foreground'
-                    : isDone
-                      ? 'border-border text-muted-foreground'
-                      : 'border-transparent text-muted-foreground'
-                }`}
-              >
-                {s.n}. {s.label}
-              </li>
-            );
-          })}
-        </ol>
-
-        <div ref={errorRef} tabIndex={-1} className="outline-none">
-          {problems.length > 0 || submitError ? (
-            <FormError heading="Before you go on" errorRef={undefined}>
-              <ul className="list-disc space-y-1 pl-5">
-                {(submitError ? [{ field: 'submit' as FieldKey, message: submitError }] : problems).map(
-                  (p, i) => (
-                    <li key={i}>{p.message}</li>
-                  )
-                )}
-              </ul>
-            </FormError>
-          ) : null}
+                className={`h-px flex-1 ${s.n <= step ? 'bg-foreground' : 'bg-border'}`}
+              />
+            ))}
+          </div>
         </div>
 
+        {/* The summary, not a message under each control. It is the only thing
+            that names what is wrong, so the fields carry `aria-invalid` for the
+            red border and nothing else. */}
+        {problems.length > 0 || submitError ? (
+          <div ref={errorRef} tabIndex={-1} className="outline-none">
+            <FormError heading="Before you go on">
+              <AuthList
+                className="mt-3"
+                tone="destructive"
+                points={(submitError
+                  ? [{ field: 'submit' as FieldKey, message: submitError }]
+                  : problems
+                ).map((p) => p.message)}
+              />
+            </FormError>
+          </div>
+        ) : null}
+
         {step === 1 ? (
-          <div className="mt-2">
-            <div className="mt-5 grid gap-x-6 sm:grid-cols-2">
-              <LabelledInput
-                id="firstName"
-                label="First name"
-                autoComplete="given-name"
-                value={formData.firstName}
-                onChange={(v) => set('firstName', v)}
-                invalid={invalid.has('firstName')}
-              />
-              <LabelledInput
-                id="middleName"
-                label="Middle name"
-                optional
-                autoComplete="additional-name"
-                value={formData.middleName}
-                onChange={(v) => set('middleName', v)}
-              />
+          <div>
+            <div className="mt-7 grid gap-x-6 sm:grid-cols-2">
+              <FormField id="firstName" label="First name">
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  required
+                  autoComplete="given-name"
+                  className="field mt-2"
+                  aria-invalid={invalid.has('firstName') ? true : undefined}
+                  value={formData.firstName}
+                  onChange={(e) => set('firstName', e.target.value)}
+                />
+              </FormField>
+              <FormField id="middleName" label="Middle name" optional>
+                <input
+                  id="middleName"
+                  name="middleName"
+                  type="text"
+                  autoComplete="additional-name"
+                  className="field mt-2"
+                  value={formData.middleName}
+                  onChange={(e) => set('middleName', e.target.value)}
+                />
+              </FormField>
             </div>
-            <LabelledInput
-              id="lastName"
-              label="Last name"
-              autoComplete="family-name"
-              value={formData.lastName}
-              onChange={(v) => set('lastName', v)}
-              invalid={invalid.has('lastName')}
-            />
-            <LabelledInput
+
+            <FormField id="lastName" label="Last name">
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                autoComplete="family-name"
+                className="field mt-2"
+                aria-invalid={invalid.has('lastName') ? true : undefined}
+                value={formData.lastName}
+                onChange={(e) => set('lastName', e.target.value)}
+              />
+            </FormField>
+
+            <FormField
               id="username"
               label="Username"
               hint="This is how you sign in, alongside your password."
-              autoComplete="username"
-              value={formData.username}
-              onChange={(v) => set('username', v)}
-              invalid={invalid.has('username')}
-            />
+            >
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                autoComplete="username"
+                className="field mt-2"
+                aria-invalid={invalid.has('username') ? true : undefined}
+                value={formData.username}
+                onChange={(e) => set('username', e.target.value)}
+              />
+            </FormField>
           </div>
         ) : null}
 
         {step === 2 ? (
           <div>
-            <LabelledInput
-              id="email"
-              label="Email address"
-              type="email"
-              autoComplete="email"
-              value={formData.email}
-              onChange={(v) => set('email', v)}
-              invalid={invalid.has('email')}
-            />
-            <LabelledInput
+            <FormField id="email" label="Email address">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                className="field mt-2"
+                aria-invalid={invalid.has('email') ? true : undefined}
+                value={formData.email}
+                onChange={(e) => set('email', e.target.value)}
+              />
+            </FormField>
+
+            <FormField
               id="phone"
               label="Phone number"
               hint="Only used if we need to reach you about the account."
-              type="tel"
-              autoComplete="tel"
-              value={formData.phone}
-              onChange={(v) => set('phone', v)}
-              invalid={invalid.has('phone')}
-            />
+            >
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                autoComplete="tel"
+                className="field mt-2"
+                aria-invalid={invalid.has('phone') ? true : undefined}
+                value={formData.phone}
+                onChange={(e) => set('phone', e.target.value)}
+              />
+            </FormField>
 
-            <div className="mt-5 max-w-measure">
-              <label htmlFor="country" className="label">
-                Country
-              </label>
+            <FormField id="country" label="Country">
               <select
                 id="country"
                 name="country"
@@ -393,16 +455,21 @@ function SignupForm() {
                 ))}
                 <option value="Other">Somewhere else</option>
               </select>
-            </div>
+            </FormField>
 
             {formData.country === 'Other' ? (
-              <LabelledInput
-                id="otherCountry"
-                label="Which country?"
-                value={formData.otherCountry}
-                onChange={(v) => set('otherCountry', v)}
-                invalid={invalid.has('otherCountry')}
-              />
+              <FormField id="otherCountry" label="Which country?">
+                <input
+                  id="otherCountry"
+                  name="otherCountry"
+                  type="text"
+                  required
+                  className="field mt-2"
+                  aria-invalid={invalid.has('otherCountry') ? true : undefined}
+                  value={formData.otherCountry}
+                  onChange={(e) => set('otherCountry', e.target.value)}
+                />
+              </FormField>
             ) : null}
 
             {formData.country && formData.country !== 'Other' ? (
@@ -413,47 +480,38 @@ function SignupForm() {
           </div>
         ) : null}
 
+        {/* The account types are a list with rules between the rows, which is how
+            the rest of the site marks a list. They were eight bordered cards in
+            two columns, and the box around a savings account made it look like a
+            separate product from the one you were opening. The radio is the
+            selection marker; nothing else has to agree with it, and nothing else
+            can get out of step with it. */}
         {step === 3 ? (
-          <fieldset className="mt-8 max-w-measure">
+          <fieldset className="mt-7 max-w-measure">
             <legend className="label">What kind of account?</legend>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              {ACCOUNT_TYPES.map((acc) => {
-                const selected = formData.accountType === acc.id;
-                return (
-                  <label
-                    key={acc.id}
-                    className={`flex cursor-pointer gap-3 border p-4 transition-colors duration-150 ${
-                      selected
-                        ? 'border-foreground bg-muted'
-                        : 'border-border hover:border-muted-foreground'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="accountType"
-                      value={acc.id}
-                      checked={selected}
-                      onChange={() => set('accountType', acc.id)}
-                      className="mt-1 h-4 w-4 shrink-0 accent-foreground"
-                    />
-                    <span>
-                      <span className="flex items-center gap-2 text-body-sm font-medium text-foreground">
-                        {acc.name}
-                        {selected ? (
-                          <Check className="h-4 w-4 shrink-0 text-foreground" aria-hidden="true" />
-                        ) : null}
-                      </span>
-                      <span className="mt-1 block text-caption text-muted-foreground">{acc.desc}</span>
+            <div className="mt-3 border-t border-border">
+              {ACCOUNT_TYPES.map((acc) => (
+                <label
+                  key={acc.id}
+                  className="flex cursor-pointer items-start gap-3 border-b border-border py-3 transition-colors duration-150 hover:bg-muted"
+                >
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value={acc.id}
+                    checked={formData.accountType === acc.id}
+                    onChange={() => set('accountType', acc.id)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-foreground"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-body-sm font-medium text-foreground">
+                      {acc.name}
                     </span>
-                  </label>
-                );
-              })}
+                    <span className="mt-1 block text-caption text-muted-foreground">{acc.desc}</span>
+                  </span>
+                </label>
+              ))}
             </div>
-            {invalid.has('accountType') ? (
-              <p className="mt-3 text-caption text-destructive">
-                Choose the kind of account you want.
-              </p>
-            ) : null}
           </fieldset>
         ) : null}
 
@@ -469,7 +527,6 @@ function SignupForm() {
               value={formData.password}
               onChange={(v) => set('password', v)}
               invalid={invalid.has('password')}
-              className={invalid.has('password') ? 'pr-24' : ''}
             />
             <ul className="mt-3 max-w-measure space-y-1 text-caption">
               {PASSWORD_RULES.map((r) => {
@@ -562,73 +619,38 @@ function SignupForm() {
           </div>
         ) : null}
 
-        <div className="mt-9 flex max-w-measure flex-wrap items-center gap-3">
+        {/* One width of button on the whole form. Sign-in runs its primary
+            action the full measure of the fields above it, and puts everything
+            secondary underneath as plain text; this is that, with "Back" as the
+            one extra line the four steps need. */}
+        <button type="submit" disabled={loading} className="btn-ink mt-7 w-full max-w-measure">
+          {loading
+            ? 'Opening your account…'
+            : step < STEPS.length
+              ? 'Continue'
+              : 'Open the account'}
+        </button>
+
+        <div className="mt-5 max-w-measure">
           {step > 1 ? (
-            <button type="button" onClick={() => setStep(step - 1)} className="btn-line">
+            <button
+              type="button"
+              onClick={() => setStep(step - 1)}
+              className="text-body-sm text-foreground underline underline-offset-4 transition-colors duration-150 hover:text-accent"
+            >
               Back
             </button>
           ) : null}
-          <button type="submit" disabled={loading} className="btn-ink disabled:opacity-50">
-            {loading
-              ? 'Opening your account…'
-              : step < STEPS.length
-                ? 'Continue'
-                : 'Open the account'}
-          </button>
-        </div>
 
-        <p className="mt-7 max-w-measure text-body-sm text-muted-foreground">
-          Already have an account?{' '}
-          <Link href="/login" className="text-foreground underline underline-offset-4 hover:text-accent">
-            Sign in
-          </Link>
-        </p>
+          <p className="mt-5 text-body-sm text-muted-foreground">
+            Already have an account?{' '}
+            <Link href="/login" className="text-foreground underline underline-offset-4 hover:text-accent">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </form>
     </AuthShell>
-  );
-}
-
-/** Label + input, sized to the reading measure like every other field here. */
-function LabelledInput({
-  id,
-  label,
-  value,
-  onChange,
-  type = 'text',
-  autoComplete,
-  hint,
-  optional,
-  invalid,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  autoComplete?: string;
-  hint?: string;
-  optional?: boolean;
-  invalid?: boolean;
-}) {
-  return (
-    <div className="mt-5 max-w-measure">
-      <label htmlFor={id} className="label">
-        {label}
-        {optional ? <span className="text-muted-foreground"> (optional)</span> : null}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        required={!optional}
-        autoComplete={autoComplete}
-        aria-invalid={invalid ? true : undefined}
-        className="field mt-2"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      {hint ? <p className="mt-2 text-caption text-muted-foreground">{hint}</p> : null}
-    </div>
   );
 }
 

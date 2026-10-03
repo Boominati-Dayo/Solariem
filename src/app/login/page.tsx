@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotePanel } from '@/components/AuthForm';
 
 /**
  * Sign in.
@@ -19,12 +20,22 @@ import { useAuth } from '@/contexts/AuthContext';
  * while appearing to offer a security choice. A checkbox that silently does
  * nothing is worse than no checkbox.
  *
- * It is deliberately NOT built on `AuthShell`, unlike the four sibling pages.
+ * It is deliberately NOT built on `AuthShell`, unlike the five sibling pages.
  * Sign-in carries a security aside that is specific to signing in, and folding
  * it into the shared component would mean a heading and a bullet list on every
- * auth page to accommodate one. The outer element is a `div` rather than a
- * `main` for the same reason as the others: `ConditionalLayout` supplies the
- * landmark, and two nested `main`s is not a valid page.
+ * auth page to accommodate one. The box that aside sits in IS `NotePanel`, and
+ * its outer element is a `div` rather than a `main` for the same reason as the
+ * others: `ConditionalLayout` supplies the landmark, and two nested `main`s is
+ * not a valid page.
+ *
+ * `self-center` on the aside, and `mx-auto w-full max-w-measure` on both
+ * columns, are copied from `AuthShell` rather than invented here: this page is
+ * the one every other auth page is measured against, so if its note hangs off
+ * the top, or its form sits against the left margin on a tablet, the others
+ * should not either.
+ *
+ * What this page is really the reference for: every other auth page is built to
+ * look like this one, so anything changed here has to change there too.
  */
 export default function LoginPage() {
   const { login, forgotPassword, user } = useAuth();
@@ -108,7 +119,7 @@ export default function LoginPage() {
         <div className="mx-auto max-w-container px-5 py-20 sm:px-8 sm:py-28">
           <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
             {/* Form */}
-            <div className="lg:col-span-6">
+            <div className="mx-auto w-full max-w-measure lg:col-span-6">
               {mode === 'signin' ? (
                 <form onSubmit={handleSignIn} noValidate>
                   <h1 className="font-display text-display-1">Sign in</h1>
@@ -292,35 +303,38 @@ export default function LoginPage() {
 
             {mode === 'signin' && !resetSent && (
               // Security note. A login page is the most credible place a
-              // phisher can point someone, so the warning belongs here.
-              <aside className="lg:col-span-6 lg:pl-8">
-                <div className="border border-border bg-muted p-6 lg:p-8">
-                  <h2 className="text-h3 font-normal text-foreground">
-                    We will never ask for your password.
-                  </h2>
-                  <p className="mt-4 max-w-measure text-body-sm text-muted-foreground">
-                    Not by phone, not by email, not by SMS, and not in a chat. No one who is genuinely
-                    us needs to know it, and no one who asks for it is us.
-                  </p>
-                  <ul className="mt-6 space-y-3 text-body-sm text-muted-foreground">
-                    <li className="border-l border-border pl-4">
+              // phisher can point someone, so the warning belongs here. It is
+              // the one thing this page has that the others do not, which is
+              // why this file is not built on AuthShell — but the box around it
+              // is NotePanel, so the frame is the same one the other five pages
+              // draw.
+              <aside className="mx-auto w-full max-w-measure self-center lg:col-span-6 lg:pl-8">
+                <NotePanel
+                  heading="We will never ask for your password."
+                  points={[
+                    <>
                       If a link brought you here, check the address bar before you type anything.
                       Or open the site yourself and navigate in — never through a link someone sent
                       you.
-                    </li>
-                    <li className="border-l border-border pl-4">
+                    </>,
+                    <>
                       We will never ask for a one-time code, and we will never ask you to move money
                       to a &ldquo;safe&rdquo; account.
-                    </li>
-                    <li className="border-l border-border pl-4">
+                    </>,
+                    <>
                       Recovery work happens inside your account. If you are asked to log in
                       somewhere else, or to send money to release funds, it is not us.
-                    </li>
-                  </ul>
-                  <Link href="/blog" className="btn-line mt-7">
-                    How these scams work
-                  </Link>
-                </div>
+                    </>,
+                  ]}
+                  action={
+                    <Link href="/blog" className="btn-line">
+                      How these scams work
+                    </Link>
+                  }
+                >
+                  Not by phone, not by email, not by SMS, and not in a chat. No one who is genuinely
+                  us needs to know it, and no one who asks for it is us.
+                </NotePanel>
               </aside>
             )}
           </div>

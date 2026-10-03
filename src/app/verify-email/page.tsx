@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { showSuccess } from '@/utils/toast';
-import { AuthShell, AuthHeading, FormError, FormField } from '@/components/AuthForm';
+import { AuthShell, AuthHeading, FormError, FormField, NotePanel } from '@/components/AuthForm';
 
 type Status = 'checking' | 'done' | 'failed';
 
@@ -127,17 +127,13 @@ function VerifyEmailForm() {
     return (
       <AuthShell
         aside={
-          <div className="border border-border bg-muted p-6 lg:p-8">
-            <h2 className="text-h3 font-normal text-foreground">What is now unlocked</h2>
-            <ul className="mt-6 space-y-3 text-body-sm text-muted-foreground">
-              <li className="border-l border-border pl-4">
-                Sending and receiving payments from your account.
-              </li>
-              <li className="border-l border-border pl-4">
-                Opening a recovery case, and following where it gets to.
-              </li>
-            </ul>
-          </div>
+          <NotePanel
+            heading="What is now unlocked"
+            points={[
+              <>Sending and receiving payments from your account.</>,
+              <>Opening a recovery case, and following where it gets to.</>,
+            ]}
+          />
         }
       >
         <AuthHeading title="Address confirmed" intro={message} />
@@ -153,17 +149,18 @@ function VerifyEmailForm() {
   return (
     <AuthShell
       aside={
-        <div className="border border-border bg-muted p-6 lg:p-8">
-          <h2 className="text-h3 font-normal text-foreground">Check the address bar first.</h2>
-          <p className="mt-4 max-w-measure text-body-sm text-muted-foreground">
-            We will never ring you or message you to ask you to confirm an address, and we will
-            never ask for a code from your phone to get into your account. If a page asking for that
-            got you here, close it and come to the site yourself.
-          </p>
-          <Link href="/blog" className="btn-line mt-7">
-            How these scams work
-          </Link>
-        </div>
+        <NotePanel
+          heading="Check the address bar first."
+          action={
+            <Link href="/blog" className="btn-line">
+              How these scams work
+            </Link>
+          }
+        >
+          We will never ring you or message you to ask you to confirm an address, and we will never
+          ask for a code from your phone to get into your account. If a page asking for that got
+          you here, close it and come to the site yourself.
+        </NotePanel>
       }
     >
       <AuthHeading title="We could not confirm that address" intro={message} />

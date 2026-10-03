@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthShell, AuthHeading, NotePanel } from '@/components/AuthForm';
+import { AuthList, AuthShell, AuthHeading, NotePanel } from '@/components/AuthForm';
 
 /**
  * Told to check your inbox, and how to get unstuck if nothing arrived.
@@ -135,11 +135,15 @@ function ActivateEmailForm() {
         }
       />
 
-      <ol className="mt-8 max-w-measure space-y-3 text-body-sm text-muted-foreground">
-        <li className="border-l border-border pl-4">Open the email we sent you.</li>
-        <li className="border-l border-border pl-4">Follow the link in it.</li>
-        <li className="border-l border-border pl-4">Come back here to confirm.</li>
-      </ol>
+      <AuthList
+        ordered
+        className="mt-8 max-w-measure"
+        points={[
+          <>Open the email we sent you.</>,
+          <>Follow the link in it.</>,
+          <>Come back here to confirm.</>,
+        ]}
+      />
 
       {confirmed ? (
         <>
