@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import PhotoBackdrop from '@/components/PhotoBackdrop';
-import FinanceHeroImg from '@/assets/images_for_pages/finance-hero.jpg';
+import SolariemExteriorImg from '@/assets/images_for_pages/solariem-exterior.png';
 
 /**
  * Hero. Full-bleed photograph carrying the whole section, copy in the left
@@ -8,15 +8,30 @@ import FinanceHeroImg from '@/assets/images_for_pages/finance-hero.jpg';
  * row, and no photo in a hairline frame beside the words — which is what this
  * was, and which is why it read as a slide rather than a page.
  *
- * The image sits at `light` (15%) under a left-anchored scrim, so it is
- * atmosphere rather than content. Nothing here is legible off the photograph
- * alone, which is the point: the copy has to be read, and the image is there
- * so the section does not look like a wall of text.
+ * The photograph is the bank itself, shot from outside: neutral grey overall,
+ * bright sky across the top half and the facade in shadow below it. That is
+ * what `scrim="left"` wants — a light solid end for the words and a darker
+ * right end for the picture, so nothing in the type has to fight the image.
+ *
+ * The image runs at full strength and the SCRIM alone does the protecting. An
+ * earlier version faded both at once, which multiplied two low-contrast values
+ * and made the photograph effectively invisible. Nothing here is legible off
+ * the photograph alone, which is the point: the copy has to be read, and the
+ * image is there so the section does not look like a wall of text.
+ *
+ * `position` is close to a no-op at desktop and the reason is worth keeping in
+ * mind before anyone "fixes" it. The section is taller in aspect than the
+ * photo (1086x849 against 1536x1024), so `object-cover` fits the height and
+ * crops the width — only the left ~15% is off-screen at `right`, and the
+ * scrim only uncovers the right quarter anyway. On a phone the section is far
+ * taller than the photo's aspect and the same crop rule crops hard sideways,
+ * which is where `right` finally earns its keep: it keeps the visible slice on
+ * the bright sky half rather than the shadowed half.
  */
 export default function BankingHero() {
   return (
     <PhotoBackdrop
-      image={FinanceHeroImg}
+      image={SolariemExteriorImg}
       scrim="left"
       photo="full"
       position="center right"

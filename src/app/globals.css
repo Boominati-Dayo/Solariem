@@ -450,6 +450,18 @@
     mix-blend-mode: screen;
   }
 
+  /* The wordmark is flat near-black (rgb 24,24,24) on a transparent ground,
+     which is right on bone and on white. On the ink footer it would sit at
+     roughly 1:1 against its own background, so on dark surfaces the whole
+     lockup drops to a single silhouette in the text colour. `brightness(0)`
+     takes the colour to black and `invert(1)` flips it to the surface's text
+     colour; the monogram's terracotta goes with it, which is the usual price
+     of a reversed one-colour logo. Applied as a filter rather than as a
+     second exported asset so the footer can never drift from the source. */
+  .logo-reverse {
+    filter: brightness(0) invert(1);
+  }
+
   .card-line {
     @apply border border-border bg-card p-6 lg:p-8;
   }
